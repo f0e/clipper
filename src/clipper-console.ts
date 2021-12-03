@@ -1,25 +1,55 @@
-const baseCommand = 'clipper';
+import netcon from './netcon';
+import * as clipper from './clipper';
+
+const helpCommand = 'clipper';
 
 class ClipperCommand {
 	command: string;
 	description: string;
-	response: string;
+	execute?: () => void;
 
-	constructor(command: string, description: string, response: string) {
-		this.command = `${baseCommand}-${command}`;
+	constructor(command: string, description: string, execute?: () => void) {
+		this.command = `${command}`;
 		this.description = description;
-		this.response = response;
+		this.execute = execute;
 	}
 
 	buildAlias = () => {
-		return `alias ${this.command} "echo ${this.response}"`;
+		let alias = `alias ${this.command} "`;
+
+		let echos = [this.command];
+
+		alias += `"${echos.map((echo) => `echo ${echo}`).join(';')}"`;
+
+		return alias;
 	};
 }
 
-class ClipperConsole {
+export class ClipperConsole {
 	commands: ClipperCommand[] = [
-		new ClipperCommand('example', 'An example command', 'hi'),
+		new ClipperCommand('clip', 'Clips the current round', () => {
+			clipper.clip('new-clip');
+		}),
 	];
+
+	connect = () => {
+		if (!netcon.connected())
+			throw new Error('ClipperConsole: Netcon not connected');
+
+		netcon.sendCommand(`alias ${helpCommand} "${this.#helpCommand()}"`);
+
+		for (const command of this.commands) {
+			netcon.sendCommand(command.buildAlias());
+		}
+
+		netcon.on('console', (message) => {
+			const command = this.commands.find(
+				(command) => command.command == message
+			);
+
+			if (command) command.execute();
+		});
+	};
 
 	#helpCommand = () => {
 		const helpStart = `Clipper commands`;
@@ -31,14 +61,8 @@ class ClipperConsole {
 			.map((command) => `echo ${command}`)
 			.join(';');
 	};
-
-	registerCommands = async (sendCommand: (command: string) => void) => {
-		await sendCommand(`alias ${baseCommand} "${this.#helpCommand()}"`);
-
-		for (const command of this.commands) {
-			await sendCommand(command.buildAlias());
-		}
-	};
 }
 
-export default ClipperConsole;
+const clipperConsole = new ClipperConsole();
+
+export default clipperConsole;

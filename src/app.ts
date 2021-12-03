@@ -1,53 +1,42 @@
 import 'dotenv/config';
 
 import express from 'express';
-import ClipperConsole from './clipper-console';
-import GameState from './gamestate';
-import Netcon from './netcon';
+import fs from 'fs-extra';
+import path from 'path';
+
+const gamestatePort = process.env.GAMESTATE_PORT || 47474;
+const netconPort = parseInt(process.env.NETCON_PORT) || 2121;
 
 // set up web server
 const app = express();
-const port = process.env.GAMESTATE_PORT || 47474;
-
 app.use(express.json());
 
-// start the server
-app
-	.listen(port, () => {
-		console.log(`App started on port ${port}`);
-	})
-	.on('error', (e) => {
-		console.log(`Fatal error: ${e.message}`);
-	});
+import netcon from './netcon';
+import clipperConsole from './clipper-console';
+import gamestate from './gamestate';
+
+import * as clipper from './clipper';
 
 async function main() {
+	const csgoPath = path.join(process.env.CSGO_FOLDER, 'csgo');
+	if (!fs.existsSync(csgoPath)) throw new Error('CSGO folder does not exist');
+
+	// start the web server
+	await app.listen(gamestatePort);
+
 	// set up gamestate
-	const gamestate = new GameState(app);
+	gamestate.initialise(app);
 
-	gamestate.addListener('change', (args) => {
-		if (args.oldValue == null) return;
-		if (args.variable == 'provider.timestamp') return;
-		console.log(
-			`variable ${args.oldValue == null ? 'initialised' : 'changed'}`,
-			args
-		);
+	// set up netcon & console
+	await netcon.connect(netconPort);
+	await clipperConsole.connect();
+
+	// set up events
+	gamestate.on('round.phase', ({ value }) => {
+		if (value == 'freezetime') clipper.onFreezetime();
 	});
 
-	gamestate.addListener('round.phase', ({ oldValue, value }) => {
-		if (value == 'freezetime') {
-			console.log('now in freezetime');
-		}
-	});
-
-	// set up netcon
-	const netcon = new Netcon();
-	await netcon.connect(parseInt(process.env.NETCON_PORT) || 2121);
-
-	netcon.on('console', (msg) => console.log('[Console]', msg));
-
-	// set up commands
-	const clipperConsole = new ClipperConsole();
-	await clipperConsole.registerCommands(netcon.sendCommand);
+	console.log('Initialised');
 }
 
 main();

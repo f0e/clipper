@@ -1,12 +1,13 @@
 import EventEmitter from 'events';
 import express, { Express, Router } from 'express';
+import fs from 'fs-extra';
 import { IGameState } from './types/gamestate.types';
 
-class GameState extends EventEmitter {
+export class GameState extends EventEmitter {
 	state = {} as IGameState;
 	router: Router;
 
-	constructor(app: Express) {
+	constructor() {
 		super();
 
 		this.router = express.Router();
@@ -14,9 +15,11 @@ class GameState extends EventEmitter {
 		this.router.post('/', (req, res) => {
 			this.update(req.body);
 		});
-
-		app.use(this.router);
 	}
+
+	initialise = (app: Express) => {
+		app.use(this.router);
+	};
 
 	update = (data: unknown) => {
 		const detectChanges = (obj: any, keyHistory: string[] = []) => {
@@ -53,4 +56,6 @@ class GameState extends EventEmitter {
 	};
 }
 
-export default GameState;
+const gamestate = new GameState();
+
+export default gamestate;
