@@ -1,11 +1,3 @@
 # Clipper
 
-.env
-
-```
-CSGO_FOLDER
-CLIP_FOLDER
-
-GAMESTATE_PORT
-NETCON_PORT
-```
+welcome
