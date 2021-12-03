@@ -9,6 +9,7 @@ enum ERecordingError {
 }
 
 enum EStopRecordingError {
+	NOT_RECORDING,
 	STOP_AT_END_ROUND,
 }
 
@@ -54,6 +55,10 @@ export async function onFreezetime() {
 			} catch (e) {
 				if (e instanceof IRecordingError) {
 					switch (e.code) {
+						case EStopRecordingError.NOT_RECORDING:
+							recordingState.recording = false;
+							break;
+
 						case EStopRecordingError.STOP_AT_END_ROUND:
 							console.log(
 								"Recording can't stop yet, recording this round as well"
@@ -201,6 +206,6 @@ async function stopRecordingDemo() {
 
 		if (success) return resolve();
 		else if (fail) return reject(new IRecordingError(failReason));
-		else return reject('unknown error');
+		else return reject(new IRecordingError(EStopRecordingError.NOT_RECORDING));
 	});
 }
