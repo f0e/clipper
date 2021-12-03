@@ -35,6 +35,13 @@ export class ClipperConsole {
 				netcon.echo(`Current mode is ${config.main.clip_mode}, not clipper.`);
 			}
 		}),
+		new ClipperCommand('status', 'Get the current status', () => {
+			if (config.main.clip_mode == 'clipper') {
+				clipper.clip('new-clip');
+			} else {
+				netcon.echo(`Current mode is ${config.main.clip_mode}, not clipper.`);
+			}
+		}),
 	];
 
 	connect = () => {

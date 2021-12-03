@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import path from 'path';
 
 import netcon from './connections/netcon';
-import clipperConsole from './connections/clipper-console';
+import clipperConsole from './connections/console';
 import gamestate from './connections/gamestate';
 import config, { parseConfig } from './config';
 import * as clips from './clips/clips';
