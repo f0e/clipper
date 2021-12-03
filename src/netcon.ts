@@ -1,6 +1,7 @@
 import EventEmitter from 'events';
 import Telnet from 'telnet-client';
 import waitOn from 'wait-on';
+import colors from 'colors';
 
 export class Netcon extends EventEmitter {
 	#connection = new Telnet();
@@ -14,7 +15,6 @@ export class Netcon extends EventEmitter {
 			timeout: 90000,
 			window: 500,
 		});
-		``;
 
 		await this.#connection.connect({
 			host: '127.0.0.1',
@@ -38,7 +38,7 @@ export class Netcon extends EventEmitter {
 	};
 
 	echo = (message: string) => {
-		console.log(`[console] ${message}`);
+		console.log(`${colors.grey('[console]')} ${message}`);
 		this.sendCommand(`echo [clipper] ${message}`);
 	};
 

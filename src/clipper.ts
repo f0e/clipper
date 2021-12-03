@@ -1,26 +1,12 @@
 import fs from 'fs-extra';
 import path from 'path';
+import gamestate from './gamestate';
 import netcon from './netcon';
-
-enum ERecordingError {
-	ALREADY_RECORDING,
-	WAIT_FOR_ROUND_OVER,
-	RECORDING_DIFFERENT_DEMO,
-}
-
-enum EStopRecordingError {
-	NOT_RECORDING,
-	STOP_AT_END_ROUND,
-}
-
-class IRecordingError extends Error {
-	code: ERecordingError | EStopRecordingError;
-
-	constructor(code: ERecordingError | EStopRecordingError) {
-		super(code.toString());
-		this.code = code;
-	}
-}
+import {
+	ERecordingError,
+	EStopRecordingError,
+	IRecordingError,
+} from './types/clipper.types';
 
 const tempDemoName = 'clipper-temp';
 
@@ -33,14 +19,22 @@ let clippingState = {
 	clipName: '',
 };
 
+let stoppingRecording = false;
+
 export function clip(clipName: string) {
 	if (!recordingState.recording)
 		return netcon.echo('Cannot clip, not recording.');
 
-	clippingState.clipping = true;
-	clippingState.clipName = clipName;
+	if (clippingState.clipping) {
+		clippingState.clipName = clipName;
 
-	netcon.echo(`Clipping to ${clippingState.clipName}`);
+		netcon.echo('Already clipping, changed clip name');
+	} else {
+		clippingState.clipping = true;
+		clippingState.clipName = clipName;
+
+		netcon.echo(`Clipping to ${clippingState.clipName}`);
+	}
 }
 
 export async function onFreezetime() {
@@ -50,7 +44,7 @@ export async function onFreezetime() {
 			try {
 				await stopRecordingDemo();
 
-				netcon.echo(`Stopped recording demo`);
+				netcon.echo('Stopped recording demo');
 				recordingState.recording = false;
 			} catch (e) {
 				if (e instanceof IRecordingError) {
@@ -60,8 +54,8 @@ export async function onFreezetime() {
 							break;
 
 						case EStopRecordingError.STOP_AT_END_ROUND:
-							console.log(
-								"Recording can't stop yet, recording this round as well"
+							netcon.echo(
+								'Recording cannot stop yet, recording this round as well'
 							);
 							break;
 					}
@@ -202,10 +196,37 @@ async function stopRecordingDemo() {
 			}
 		};
 
+		stoppingRecording = true;
 		await netcon.sendCommand('stop', waitForRecord);
+		stoppingRecording = false;
 
 		if (success) return resolve();
 		else if (fail) return reject(new IRecordingError(failReason));
 		else return reject(new IRecordingError(EStopRecordingError.NOT_RECORDING));
+	});
+}
+
+export function onRecordingStop() {
+	if (stoppingRecording) return; // already handling.
+
+	if (recordingState.recording) {
+		recordingState.recording = false;
+		netcon.echo('Stopped recording demo');
+	}
+}
+
+export function initialise() {
+	gamestate.on('round.phase', ({ value }) => {
+		if (value == 'freezetime') onFreezetime();
+	});
+
+	netcon.on('console', (message: string) => {
+		const demoStoppedRegex =
+			/^Completed demo, recording time (.*?), game frames (.*?)\.$/;
+
+		const match = message.match(demoStoppedRegex);
+		if (match) {
+			onRecordingStop();
+		}
 	});
 }

@@ -31,10 +31,8 @@ async function main() {
 	await netcon.connect(netconPort);
 	await clipperConsole.connect();
 
-	// set up events
-	gamestate.on('round.phase', ({ value }) => {
-		if (value == 'freezetime') clipper.onFreezetime();
-	});
+	// set up clipper
+	clipper.initialise();
 
 	console.log('Initialised');
 }
