@@ -56,5 +56,4 @@ export class GameState extends EventEmitter {
 }
 
 const gamestate = new GameState();
-
 export default gamestate;

@@ -1,5 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
+import config from './config';
 import gamestate from './gamestate';
 import netcon from './netcon';
 import {
@@ -67,8 +68,8 @@ export async function onFreezetime() {
 			if (clippingState.clipping) {
 				console.log(`Saving clip ${clippingState.clipName}`);
 
-				const csgoPath = path.join(process.env.CSGO_FOLDER, 'csgo');
-				const clipPath = path.join(csgoPath, process.env.CLIP_FOLDER);
+				const csgoPath = path.join(config.paths.csgo, 'csgo');
+				const clipPath = path.join(csgoPath, config.paths.clips);
 
 				fs.ensureDir(clipPath);
 

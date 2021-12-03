@@ -84,5 +84,4 @@ export class Netcon extends EventEmitter {
 }
 
 const netcon = new Netcon();
-
 export default netcon;

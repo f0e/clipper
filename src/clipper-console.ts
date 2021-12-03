@@ -64,5 +64,4 @@ export class ClipperConsole {
 }
 
 const clipperConsole = new ClipperConsole();
-
 export default clipperConsole;
