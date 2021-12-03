@@ -2,18 +2,15 @@ import express from 'express';
 import fs from 'fs-extra';
 import path from 'path';
 
-import netcon from './netcon';
-import clipperConsole from './clipper-console';
-import gamestate from './gamestate';
+import netcon from './connections/netcon';
+import clipperConsole from './connections/clipper-console';
+import gamestate from './connections/gamestate';
 import config, { parseConfig } from './config';
-
-import * as clipper from './clipper';
+import * as clips from './clips/clips';
 
 async function main() {
 	// load config
 	await parseConfig();
-
-	console.log(config);
 
 	// verify environment variables
 	if (!config.ports.gamestate) throw new Error('Gamestate port not defined');
@@ -36,9 +33,13 @@ async function main() {
 	await clipperConsole.connect();
 
 	// set up clipper
-	clipper.initialise();
+	clips.initialise();
 
-	console.log('Initialised');
+	console.log(`Initialised ${config.main.clip_mode}`);
 }
 
-main();
+try {
+	main();
+} catch (e) {
+	console.log(e.message);
+}

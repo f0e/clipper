@@ -1,6 +1,6 @@
 import EventEmitter from 'events';
 import express, { Express, Router } from 'express';
-import { IGameState } from './types/gamestate.types';
+import { IGameState } from '../types/gamestate.types';
 
 export class GameState extends EventEmitter {
 	state = {} as IGameState;
@@ -21,7 +21,13 @@ export class GameState extends EventEmitter {
 	};
 
 	update = (data: unknown) => {
-		const detectChanges = (obj: any, keyHistory: string[] = []) => {
+		const oldState = {} as IGameState;
+		Object.assign(oldState, this.state);
+
+		const detectChanges = (
+			obj: any = this.state,
+			keyHistory: string[] = []
+		) => {
 			for (const [key, value] of Object.entries(obj)) {
 				const newKeyHistory = keyHistory.concat(key);
 
@@ -30,28 +36,33 @@ export class GameState extends EventEmitter {
 				} else {
 					const keyPath = newKeyHistory.join('.');
 
-					let currentValue = null;
+					let oldValue = null;
 					try {
-						let cur: any = this.state;
+						let cur: any = oldState;
 						for (const historicKey of newKeyHistory) cur = cur[historicKey];
-						currentValue = cur;
+						oldValue = cur;
 					} catch (e) {}
 
-					if (currentValue != value) {
-						this.emit(keyPath, { oldValue: currentValue, value });
+					if (oldValue != value) {
+						this.emit(keyPath, { oldValue: oldValue, value });
 						this.emit('change', {
 							variable: keyPath,
-							oldValue: currentValue,
-							value: value,
+							oldValue,
+							value,
 						});
 					}
 				}
 			}
 		};
 
-		detectChanges(data);
-
 		Object.assign(this.state, data);
+
+		this.emit('update', {
+			oldState,
+			newState: this.state,
+		});
+
+		detectChanges();
 	};
 }
 

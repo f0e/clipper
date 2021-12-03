@@ -1,5 +1,6 @@
 import netcon from './netcon';
-import * as clipper from './clipper';
+import config from '../config';
+import * as clipper from '../clips/clipper';
 
 const helpCommand = 'clipper';
 
@@ -28,7 +29,11 @@ class ClipperCommand {
 export class ClipperConsole {
 	commands: ClipperCommand[] = [
 		new ClipperCommand('clip', 'Clips the current round', () => {
-			clipper.clip('new-clip');
+			if (config.main.clip_mode == 'clipper') {
+				clipper.clip('new-clip');
+			} else {
+				netcon.echo(`Current mode is ${config.main.clip_mode}, not clipper.`);
+			}
 		}),
 	];
 

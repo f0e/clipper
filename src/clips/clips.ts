@@ -1,118 +1,26 @@
 import fs from 'fs-extra';
-import path from 'path';
-import config from './config';
-import gamestate from './gamestate';
-import netcon from './netcon';
+import config from '../config';
+import netcon from '../connections/netcon';
 import {
 	ERecordingError,
-	EStopRecordingError,
 	IRecordingError,
-} from './types/clipper.types';
+	EStopRecordingError,
+} from '../types/clipper.types';
 
-const tempDemoName = 'clipper-temp';
+import * as clipper from './clipper';
+import * as archiver from './archiver';
+import path from 'path';
 
 let recordingState = {
 	recording: false,
 };
 
-let clippingState = {
-	clipping: false,
-	clipName: '',
-};
-
 let stoppingRecording = false;
 
-export function clip(clipName: string) {
-	if (!recordingState.recording)
-		return netcon.echo('Cannot clip, not recording.');
+export const isRecording = () => recordingState.recording;
+export const forceStopRecording = () => (recordingState.recording = false);
 
-	if (clippingState.clipping) {
-		clippingState.clipName = clipName;
-
-		netcon.echo('Already clipping, changed clip name');
-	} else {
-		clippingState.clipping = true;
-		clippingState.clipName = clipName;
-
-		netcon.echo(`Clipping to ${clippingState.clipName}`);
-	}
-}
-
-export async function onFreezetime() {
-	// new freezetime, start recording demo
-	try {
-		if (recordingState.recording) {
-			try {
-				await stopRecordingDemo();
-
-				netcon.echo('Stopped recording demo');
-				recordingState.recording = false;
-			} catch (e) {
-				if (e instanceof IRecordingError) {
-					switch (e.code) {
-						case EStopRecordingError.NOT_RECORDING:
-							recordingState.recording = false;
-							break;
-
-						case EStopRecordingError.STOP_AT_END_ROUND:
-							netcon.echo(
-								'Recording cannot stop yet, recording this round as well'
-							);
-							break;
-					}
-				}
-			}
-		}
-
-		if (!recordingState.recording) {
-			if (clippingState.clipping) {
-				console.log(`Saving clip ${clippingState.clipName}`);
-
-				const csgoPath = path.join(config.paths.csgo, 'csgo');
-				const clipPath = path.join(csgoPath, config.paths.clips);
-
-				fs.ensureDir(clipPath);
-
-				await fs.rename(
-					path.join(csgoPath, `${tempDemoName}.dem`),
-					path.join(clipPath, `${clippingState.clipName}.dem`)
-				);
-
-				netcon.echo(`Clip ${clippingState.clipName} saved!`);
-
-				clippingState.clipping = false;
-			}
-
-			await recordDemo(`clipper-temp`);
-			netcon.echo('Recording demo...');
-
-			// update recording state
-			recordingState.recording = true;
-		}
-	} catch (e) {
-		if (e instanceof IRecordingError) {
-			switch (e.code) {
-				case ERecordingError.ALREADY_RECORDING: {
-					netcon.echo(
-						'You are already recording a demo, please stop recording manually to enable clipper.'
-					);
-
-					break;
-				}
-				case ERecordingError.WAIT_FOR_ROUND_OVER: {
-					// todo: this
-					break;
-				}
-				case ERecordingError.RECORDING_DIFFERENT_DEMO: {
-					// todo: this
-					break;
-				}
-			}
-		} else throw e;
-	}
-}
-
-async function recordDemo(demoName: string) {
+export async function recordDemo(demoName: string) {
 	return new Promise<void>(async (resolve, reject) => {
 		// todo: better solution than this
 		let success = false,
@@ -162,7 +70,7 @@ async function recordDemo(demoName: string) {
 	});
 }
 
-async function stopRecordingDemo() {
+export async function stopRecordingDemo() {
 	return new Promise<void>(async (resolve, reject) => {
 		// todo: better solution than this
 		let success = false,
@@ -207,6 +115,14 @@ async function stopRecordingDemo() {
 	});
 }
 
+export function onRecordingStart(demoName: string) {
+	if (!recordingState.recording) {
+		// update recording state
+		netcon.echo(`Recording demo '${demoName}'...`);
+		recordingState.recording = true;
+	}
+}
+
 export function onRecordingStop() {
 	if (stoppingRecording) return; // already handling.
 
@@ -216,11 +132,35 @@ export function onRecordingStop() {
 	}
 }
 
-export function initialise() {
-	gamestate.on('round.phase', ({ value }) => {
-		if (value == 'freezetime') onFreezetime();
-	});
+export function fixDuplicateDemoName(demoName: string, subFolder: string) {
+	const fullArchivePath = path.join(config.paths.csgo, 'csgo', subFolder);
 
+	let currentDemoName = demoName;
+	let i = 1;
+	while (fs.existsSync(path.join(fullArchivePath, demoName))) {
+		currentDemoName = demoName + '_' + i++;
+	}
+
+	return currentDemoName;
+}
+
+export async function initialise() {
+	// create directories
+	const clipperPath = path.join(config.paths.csgo, 'csgo', config.paths.demos);
+	await fs.ensureDir(path.join(clipperPath, config.paths.clips));
+	await fs.ensureDir(path.join(clipperPath, config.paths.archives));
+
+	// initialise the selected mode
+	switch (config.main.clip_mode) {
+		case 'clipper':
+			clipper.initialise();
+			break;
+		case 'archiver':
+			archiver.initialise();
+			break;
+	}
+
+	// handle manually stopping recording / game automatic stopping at end of round
 	netcon.on('console', (message: string) => {
 		const demoStoppedRegex =
 			/^Completed demo, recording time (.*?), game frames (.*?)\.$/;
