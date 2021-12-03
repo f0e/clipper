@@ -1,4 +1,4 @@
-export interface GameStateProvider {
+export interface IGameStateProvider {
 	name: string;
 	appid: number;
 	version: number;
@@ -6,7 +6,7 @@ export interface GameStateProvider {
 	timestamp: number;
 }
 
-export interface GameStateTeam {
+export interface IGameStateTeam {
 	score: number;
 	name: string;
 	consecutive_round_losses: number;
@@ -14,23 +14,23 @@ export interface GameStateTeam {
 	mathces_won_this_series: number;
 }
 
-export interface GameStateMap {
+export interface IGameStateMap {
 	mode: string;
 	name: string;
 	phase: 'warmup' | 'intermission' | 'gameover' | 'live';
 	round: number;
-	team_ct: GameStateTeam;
-	team_t: GameStateTeam;
+	team_ct: IGameStateTeam;
+	team_t: IGameStateTeam;
 	num_matches_to_win_series: number;
 	current_spectators: number;
 	souvenirs_total: number;
 }
 
-export interface GameStateRound {
+export interface IGameStateRound {
 	phase: 'freezetime' | 'over' | 'live';
 }
 
-export interface GameStatePlayerState {
+export interface IGameStatePlayerState {
 	health: number;
 	armor: number;
 	helmet: boolean;
@@ -44,7 +44,7 @@ export interface GameStatePlayerState {
 	equip_value: number;
 }
 
-export interface GameStatePlayerMatchStats {
+export interface IGameStatePlayerMatchStats {
 	kills: number;
 	assists: number;
 	deaths: number;
@@ -52,36 +52,36 @@ export interface GameStatePlayerMatchStats {
 	score: number;
 }
 
-export interface GameStatePlayerWeapons {
+export interface IGameStatePlayerWeapons {
 	weapon_0: any;
 	weapon_1: any;
 	weapon_2: any;
 	weapon_3: any;
 }
 
-export interface GameStateLocalPlayer {
+export interface IGameStateLocalPlayer {
 	steamid: string;
 	clan: string;
 	name: string;
 	observer_slot: number;
 	team: 'T' | 'CT';
 	activity: 'playing' | 'free' | 'textinput' | 'menu';
-	state: GameStatePlayerState;
-	matchStats: GameStatePlayerMatchStats;
-	weapons: GameStatePlayerWeapons;
+	state: IGameStatePlayerState;
+	matchStats: IGameStatePlayerMatchStats;
+	weapons: IGameStatePlayerWeapons;
 }
 
-export interface GameStatePlayer {}
+export interface IGameStatePlayer {}
 
-export interface GameStateAuth {
+export interface IGameStateAuth {
 	token: string;
 }
 
-export interface GameState {
-	provider: GameStateProvider;
-	map: GameStateMap;
-	round: GameStateRound;
-	player: GameStateLocalPlayer;
-	all_players: GameStatePlayer;
-	auth: GameStateAuth;
+export interface IGameState {
+	provider: IGameStateProvider;
+	map: IGameStateMap;
+	round: IGameStateRound;
+	player: IGameStateLocalPlayer;
+	all_players: IGameStatePlayer;
+	auth: IGameStateAuth;
 }

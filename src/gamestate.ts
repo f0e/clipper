@@ -1,8 +1,22 @@
 import EventEmitter from 'events';
-import { GameState } from './types/gamestate.types';
+import express, { Express, Router } from 'express';
+import { IGameState } from './types/gamestate.types';
 
-class Game extends EventEmitter {
-	state = {} as GameState;
+class GameState extends EventEmitter {
+	state = {} as IGameState;
+	router: Router;
+
+	constructor(app: Express) {
+		super();
+
+		this.router = express.Router();
+
+		this.router.post('/', (req, res) => {
+			this.update(req.body);
+		});
+
+		app.use(this.router);
+	}
 
 	update = (data: unknown) => {
 		const detectChanges = (obj: any, keyHistory: string[] = []) => {
@@ -39,4 +53,4 @@ class Game extends EventEmitter {
 	};
 }
 
-export default Game;
+export default GameState;
