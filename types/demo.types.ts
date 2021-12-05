@@ -1,4 +1,4 @@
-import { ClipMode } from '../clipper/src/config';
+import { ClipMode } from './config.types';
 
 export interface IDemoHeaders {
 	localPlayer: string;

@@ -1,5 +1,6 @@
 import express from 'express';
-import { body, query } from 'express-validator';
+import { query, body } from 'express-validator';
+import config from '../../config';
 import netcon from '../../connections/netcon';
 import * as util from '../../util/util';
 import validate from '../util/validate';
@@ -11,6 +12,10 @@ apiRouter.get('/get-demos', async (req, res) => {
 		clips: await util.getDemos('clipper'),
 		archives: await util.getDemos('archiver'),
 	});
+});
+
+apiRouter.get('/get-config', (req, res) => {
+	return res.json(config);
 });
 
 apiRouter.post('/parse-demos', async (req, res) => {

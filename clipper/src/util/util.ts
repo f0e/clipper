@@ -1,7 +1,8 @@
 import fs from 'fs-extra';
 import path from 'path';
 import Demo from '../../../types/demo.types';
-import config, { ClipMode } from '../config';
+import config from '../config';
+import { ClipMode } from '../../../types/config.types';
 import * as demo from './demo';
 
 // ---- main

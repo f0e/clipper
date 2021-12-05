@@ -13,6 +13,10 @@ const Navbar = (): ReactElement => {
 				</Link>
 
 				<div style={{ flexGrow: 1 }}></div>
+
+				<Link to="/settings" className="navbar-link">
+					Settings
+				</Link>
 			</Toolbar>
 		</AppBar>
 	);

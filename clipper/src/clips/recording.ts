@@ -1,8 +1,9 @@
 import fs from 'fs-extra';
 import path from 'path';
-import config, { ClipMode } from '../config';
+import config from '../config';
 import netcon from '../connections/netcon';
 import { ERecordingError, IRecordingError } from '../../../types/clipper.types';
+import { ClipMode } from '../../../types/config.types';
 
 import * as clipper from './clipper';
 import * as archiver from './archiver';

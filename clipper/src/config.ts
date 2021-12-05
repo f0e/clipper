@@ -1,5 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
+import IConfig from '../../types/config.types';
 import * as helpers from './util/helpers';
 
 const CONFIG_PATH = path.join(
@@ -9,31 +10,6 @@ const CONFIG_PATH = path.join(
 			: process.env.HOME + '/.local/share'),
 	'clipper/config.json'
 );
-
-export type ClipMode = 'clipper' | 'archiver';
-
-interface IConfig {
-	main: {
-		clip_mode: ClipMode;
-	};
-
-	clipper: {
-		clip_at_round_end: boolean;
-	};
-
-	paths: {
-		csgo: string;
-		base: string;
-		clipper: string;
-		archiver: string;
-		demo_info: string;
-	};
-
-	ports: {
-		gamestate: number;
-		netcon: number;
-	};
-}
 
 const config: IConfig = {
 	main: {

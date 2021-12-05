@@ -6,6 +6,7 @@ import { ApiStore } from './context/ApiContext';
 import Navbar from './components/Navbar/Navbar';
 import MessageBar from './components/MessageBar/MessageBar';
 import Home from './pages/Home/Home';
+import Settings from './pages/Settings/Settings';
 
 import './styles/variables.scss';
 import './App.scss';
@@ -22,6 +23,7 @@ const App = (): ReactElement => {
 							<main>
 								<Routes>
 									<Route path="/" element={<Home />} />
+									<Route path="/settings" element={<Settings />} />
 								</Routes>
 							</main>
 
