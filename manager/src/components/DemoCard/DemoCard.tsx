@@ -14,7 +14,7 @@ interface DemoCardProps {
 
 const DemoCard = ({ demo }: DemoCardProps): ReactElement => {
 	const [waitingToPlay, setWaitingToPlay] = useState(false);
-	const [parsing, setParsing] = useState(false);
+	// const [parsing, setParsing] = useState(false);
 
 	const Api = useContext(ApiContext);
 
@@ -29,16 +29,16 @@ const DemoCard = ({ demo }: DemoCardProps): ReactElement => {
 		setWaitingToPlay(false);
 	};
 
-	const parse = async () => {
-		setParsing(true);
+	// const parse = async () => {
+	// 	setParsing(true);
 
-		await Api.post('/parse-demo', {
-			mode: demo.mode,
-			demoName: demo.filename,
-		});
+	// 	await Api.post('/parse-demo', {
+	// 		mode: demo.mode,
+	// 		demoName: demo.filename,
+	// 	});
 
-		setParsing(false);
-	};
+	// 	setParsing(false);
+	// };
 
 	return (
 		<Card className="demo-card" variant="outlined">
@@ -85,12 +85,12 @@ const DemoCard = ({ demo }: DemoCardProps): ReactElement => {
 						<Button variant="contained">Edit</Button>
 					</Link>
 
-					<LoadingButton
+					{/* <LoadingButton
 						variant="contained"
 						onClick={parse}
 						label="re-parse"
 						loading={parsing}
-					/>
+					/> */}
 				</div>
 			</CardContent>
 		</Card>

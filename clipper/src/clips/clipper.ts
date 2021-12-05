@@ -55,10 +55,8 @@ export async function onFreezetime() {
 		}
 
 		if (!recording.isRecording()) {
-			const demoName = 'clipper-temp';
-
-			await recording.recordDemo(demoName);
-			recording.onRecordingStart(demoName);
+			await recording.recordDemo(tempDemoName);
+			recording.onRecordingStart(tempDemoName);
 
 			if (config.clipper.clip_at_round_end) {
 				await recording.stopRecordingDemo();
@@ -85,12 +83,14 @@ export async function saveClip() {
 
 	console.log(`Saving clip ${clippingState.clipName}`);
 
+	const fixedClipName = recording.fixDuplicateDemoName(
+		clippingState.clipName,
+		'clipper'
+	);
+
 	await fs.rename(
 		path.join(util.getCsgoPath(), `${tempDemoName}.dem`),
-		path.join(
-			util.getBaseDemoPath('clipper', true),
-			`${clippingState.clipName}.dem`
-		)
+		path.join(util.getBaseDemoPath('clipper', true), `${fixedClipName}.dem`)
 	);
 
 	netcon.echo(`Clip ${clippingState.clipName} saved!`);
