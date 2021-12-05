@@ -1,0 +1,34 @@
+.demo-card {
+	margin-bottom: 0.5rem; // temporary
+
+	.demo-card-content {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+
+		.demo-map-icon {
+			margin-right: 1rem;
+		}
+
+		.demo-info {
+			.demo-name {
+				font-weight: bold;
+			}
+
+			.demo-player,
+			.demo-map {
+				font-style: italic;
+			}
+		}
+
+		.demo-spacer {
+			flex-grow: 1;
+		}
+
+		.demo-buttons {
+			display: flex;
+			flex-direction: row;
+			gap: 0.5rem;
+		}
+	}
+}

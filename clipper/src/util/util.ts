@@ -2,6 +2,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import Demo from '../../../types/demo.types';
 import config, { ClipMode } from '../config';
+import * as demo from './demo';
 
 // ---- main
 export function getCsgoPath() {
@@ -58,14 +59,56 @@ export async function getDemos(mode: ClipMode) {
 	// get demo infos
 	const demos: Demo[] = [];
 	for (const demoFilename of filenames) {
+		const { name: demoName } = path.parse(demoFilename);
+		const demoPath = path.join(getDemoPath(mode, demoFilename));
+
 		const demoInfo = await getDemoInfo(mode, demoFilename);
 
 		demos.push({
-			name: path.parse(demoFilename).name,
+			name: demoName,
+			filename: demoFilename,
+			path: demoPath,
+			mode: mode,
+
 			parsed: demoInfo != null,
 			info: demoInfo,
 		});
 	}
 
 	return demos;
+}
+
+export async function parseDemo(
+	mode: ClipMode,
+	demoName: string,
+	skipIfDone: boolean = true
+) {
+	const demoPath = getDemoPath(mode, demoName);
+	const demoInfoPath = getDemoInfoPath(mode, demoName);
+
+	if (skipIfDone) {
+		if (fs.existsSync(demoInfoPath)) return;
+	}
+
+	const demoInfo = await demo.parseDemo(demoPath);
+	await fs.writeJSON(demoInfoPath, demoInfo);
+
+	console.log(`parsed demo ${demoName} (${mode})`);
+}
+
+export async function parseDemos() {
+	const update = async (mode: ClipMode) => {
+		const demoInfosPath = getBaseDemoInfoPath(mode);
+		await fs.ensureDir(demoInfosPath);
+
+		const demos = await getDemoFilenames(mode);
+		console.log(`updating ${demos.length} demos (${mode})`);
+
+		for (const demoFilename of demos) {
+			await parseDemo(mode, demoFilename);
+		}
+	};
+
+	await update('clipper');
+	await update('archiver');
 }

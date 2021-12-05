@@ -5,11 +5,7 @@ import gamestate from '../connections/gamestate';
 import netcon from '../connections/netcon';
 import * as recording from './recording';
 import * as util from '../util/util';
-import {
-	ERecordingError,
-	EStopRecordingError,
-	IRecordingError,
-} from '../../../types/clipper.types';
+import { ERecordingError, IRecordingError } from '../../../types/clipper.types';
 
 const tempDemoName = 'clipper-temp';
 
@@ -40,16 +36,14 @@ export async function onFreezetime() {
 			try {
 				await recording.stopRecordingDemo();
 				recording.onRecordingStop();
-
-				saveClip();
 			} catch (e) {
 				if (e instanceof IRecordingError) {
 					switch (e.code) {
-						case EStopRecordingError.NOT_RECORDING: {
+						case ERecordingError.STOP_NOT_RECORDING: {
 							recording.forceStopRecording();
 							break;
 						}
-						case EStopRecordingError.STOP_AT_END_ROUND: {
+						case ERecordingError.STOP_STOPPING_AT_END_ROUND: {
 							netcon.echo(
 								'Recording cannot stop yet, recording this round as well'
 							);
@@ -67,6 +61,8 @@ export async function onFreezetime() {
 			let demoName = `${gamestate.state.map.name}_clipper-temp`;
 			demoName = recording.fixDuplicateDemoName(demoName, 'clipper');
 
+			console.log('Trying to record...');
+
 			await recording.recordDemo(demoName);
 			recording.onRecordingStart(demoName);
 
@@ -77,7 +73,8 @@ export async function onFreezetime() {
 	} catch (e) {
 		if (e instanceof IRecordingError) {
 			switch (e.code) {
-				case ERecordingError.ALREADY_RECORDING: {
+				case ERecordingError.RECORD_ALREADY_RECORDING: {
+					console.log('Hmmmm....', e);
 					netcon.echo(
 						'You are already recording a demo, please stop recording manually to enable clipper.'
 					);
@@ -89,7 +86,7 @@ export async function onFreezetime() {
 	}
 }
 
-async function saveClip() {
+export async function saveClip() {
 	if (!clippingState.clipping) return;
 
 	console.log(`Saving clip ${clippingState.clipName}`);

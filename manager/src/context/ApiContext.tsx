@@ -8,7 +8,7 @@ type ApiCallParameters = {
 
 export interface ApiContextInterface {
 	get: (url: string, parameters?: ApiCallParameters) => Promise<any>;
-	post: (url: string, body: ApiCallParameters) => Promise<any>;
+	post: (url: string, body?: ApiCallParameters) => Promise<any>;
 }
 
 const ApiContext = createContext({} as ApiContextInterface);
@@ -41,7 +41,7 @@ export const ApiStore: FunctionComponent = ({ children }) => {
 
 	const post = async (
 		url: string,
-		parameters: ApiCallParameters
+		parameters?: ApiCallParameters
 	): Promise<any> => {
 		try {
 			const res = await axios.post(url, parameters);

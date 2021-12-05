@@ -1,3 +1,5 @@
+import { ClipMode } from '../clipper/src/config';
+
 export interface IDemoHeaders {
 	localPlayer: string;
 	serverName: string;
@@ -13,6 +15,9 @@ export class DemoInfo {
 
 export default class Demo {
 	name: string;
+	filename: string;
+	path: string;
+	mode: ClipMode;
 
 	parsed: boolean;
 	info: DemoInfo;

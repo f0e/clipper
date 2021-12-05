@@ -72,14 +72,16 @@ export class Netcon extends EventEmitter {
 		});
 	};
 
+	playDemo = async (demoPath: string) => {
+		await this.sendCommand(`playdemo "${demoPath}"`);
+	};
+
 	recordDemo = async (demoName: string) => {
-		const res = await this.sendCommand(`record ${demoName}`);
-		console.log(res);
+		await this.sendCommand(`record "${demoName}"`);
 	};
 
 	stopRecordingDemo = async () => {
-		const res = await this.sendCommand(`stop`);
-		console.log(res);
+		await this.sendCommand(`stop`);
 	};
 }
 

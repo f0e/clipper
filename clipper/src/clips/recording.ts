@@ -2,11 +2,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import config, { ClipMode } from '../config';
 import netcon from '../connections/netcon';
-import {
-	ERecordingError,
-	IRecordingError,
-	EStopRecordingError,
-} from '../../../types/clipper.types';
+import { ERecordingError, IRecordingError } from '../../../types/clipper.types';
 
 import * as clipper from './clipper';
 import * as archiver from './archiver';
@@ -47,17 +43,17 @@ export async function recordDemo(demoName: string) {
 			const successRegex = /^Recording to (.*?)\.dem\.\.\.$/;
 
 			if (message == alreadyRecording)
-				return commandFail(ERecordingError.ALREADY_RECORDING);
+				return commandFail(ERecordingError.RECORD_ALREADY_RECORDING);
 
 			if (message == waitForRoundOver)
-				return commandFail(ERecordingError.WAIT_FOR_ROUND_OVER);
+				return commandFail(ERecordingError.RECORD_WAIT_FOR_ROUND_OVER);
 
 			// check for recording
 			const match = message.match(successRegex);
 			if (match) {
 				const recordingDemoName = match[1];
 				if (recordingDemoName != demoName)
-					return commandFail(ERecordingError.RECORDING_DIFFERENT_DEMO);
+					return commandFail(ERecordingError.RECORD_RECORDING_DIFFERENT_DEMO);
 
 				commandSuccess();
 			}
@@ -76,9 +72,9 @@ export async function stopRecordingDemo() {
 		// todo: better solution than this
 		let success = false,
 			fail = false,
-			failReason: EStopRecordingError;
+			failReason: ERecordingError;
 
-		const commandFail = (error: EStopRecordingError) => {
+		const commandFail = (error: ERecordingError) => {
 			if (success) return;
 
 			fail = true;
@@ -97,7 +93,7 @@ export async function stopRecordingDemo() {
 				'Demo recording will stop as soon as the round is over.';
 
 			if (message == stopAtRoundEnd)
-				return commandFail(EStopRecordingError.STOP_AT_END_ROUND);
+				return commandFail(ERecordingError.STOP_STOPPING_AT_END_ROUND);
 
 			// check for recording
 			const match = message.match(successRegex);
@@ -112,7 +108,7 @@ export async function stopRecordingDemo() {
 
 		if (success) return resolve();
 		else if (fail) return reject(new IRecordingError(failReason));
-		else return reject(new IRecordingError(EStopRecordingError.NOT_RECORDING));
+		else return reject(new IRecordingError(ERecordingError.STOP_NOT_RECORDING));
 	});
 }
 
@@ -124,12 +120,20 @@ export function onRecordingStart(demoName: string) {
 	}
 }
 
-export function onRecordingStop() {
+export async function onRecordingStop() {
 	if (stoppingRecording) return; // already handling.
 
 	if (recordingState.recording) {
 		recordingState.recording = false;
 		netcon.echo('Stopped recording demo');
+
+		// mode-specific functions
+		if (config.main.clip_mode == 'clipper') {
+			await clipper.saveClip();
+		}
+
+		// parse new demos
+		util.parseDemos(); // run async, parsing takes a while
 	}
 }
 

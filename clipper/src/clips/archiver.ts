@@ -26,7 +26,7 @@ async function startArchive() {
 	} catch (e) {
 		if (e instanceof IRecordingError) {
 			switch (e.code) {
-				case ERecordingError.ALREADY_RECORDING: {
+				case ERecordingError.RECORD_ALREADY_RECORDING: {
 					netcon.echo('You are already recording a demo.');
 					break;
 				}
