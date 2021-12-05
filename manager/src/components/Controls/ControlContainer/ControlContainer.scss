@@ -1,0 +1,12 @@
+.setting-container {
+  display: grid;
+  grid-template-columns: auto minmax(auto, 15rem);
+  gap: 2rem;
+  align-items: center;
+  justify-content: space-between;
+
+  & > *:nth-child(n + 2) {
+    // not sure of a better way
+    justify-self: end;
+  }
+}

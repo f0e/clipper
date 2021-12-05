@@ -3,8 +3,10 @@ import ApiContext from '../../context/ApiContext';
 import Demo from '../../../../types/demo.types';
 import DemoList from '../../components/DemoList/DemoList';
 import Loader from '../../components/Loader/Loader';
-import MessageContext from '../../context/MessageContext';
 import LoadingButton from '../../components/LoadingButton/LoadingButton';
+import MessageContext from '../../context/MessageContext';
+
+import './Home.scss';
 
 const Home = (): ReactElement => {
 	const [loading, setLoading] = useState(true);

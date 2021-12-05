@@ -1,0 +1,27 @@
+.blur-slider {
+  .label-value {
+    appearance: textfield;
+    border: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+    width: 100%;
+    outline: none;
+
+    padding: 0;
+    font-weight: bold;
+
+    transition: 0.15s border-bottom;
+
+    &:hover {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+    }
+
+    &:focus {
+      border-bottom: 1px solid #000;
+    }
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+    }
+  }
+}

@@ -2,7 +2,15 @@
 	"name": "manager",
 	"version": "0.1.0",
 	"private": true,
+	"proxy": "http://localhost:3001",
+	"scripts": {
+		"start": "craco start",
+		"build": "craco build",
+		"test": "craco test",
+		"eject": "craco eject"
+	},
 	"dependencies": {
+		"@craco/craco": "^6.4.2",
 		"@emotion/react": "^11.7.0",
 		"@emotion/styled": "^11.6.0",
 		"@mui/material": "^5.2.2",
@@ -12,6 +20,7 @@
 		"axios": "^0.24.0",
 		"react": "^17.0.2",
 		"react-dom": "^17.0.2",
+		"react-input-autosize": "^3.0.0",
 		"react-router-dom": "^6.0.2",
 		"react-scripts": "4.0.3",
 		"sass": "^1.44.0",
@@ -22,14 +31,8 @@
 		"@types/jest": "^27.0.3",
 		"@types/node": "^16.11.11",
 		"@types/react": "^17.0.37",
-		"@types/react-dom": "^17.0.11"
-	},
-	"proxy": "http://localhost:3001",
-	"scripts": {
-		"start": "react-scripts start",
-		"build": "react-scripts build",
-		"test": "react-scripts test",
-		"eject": "react-scripts eject"
+		"@types/react-dom": "^17.0.11",
+		"@types/react-input-autosize": "^2.2.1"
 	},
 	"eslintConfig": {
 		"extends": [
