@@ -1,5 +1,6 @@
 import React, { ReactElement, useContext, useState } from 'react';
-import { Card, CardContent } from '@mui/material';
+import { Link } from 'react-router-dom';
+import { Button, Card, CardContent } from '@mui/material';
 import Demo from '../../../../types/demo.types';
 import ApiContext from '../../context/ApiContext';
 import LoadingButton from '../LoadingButton/LoadingButton';
@@ -79,6 +80,10 @@ const DemoCard = ({ demo }: DemoCardProps): ReactElement => {
 						label="play"
 						loading={waitingToPlay}
 					/>
+
+					<Link to={`${demo.mode}/${demo.name}`}>
+						<Button variant="contained">Edit</Button>
+					</Link>
 
 					<LoadingButton
 						variant="contained"

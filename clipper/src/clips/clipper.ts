@@ -55,13 +55,7 @@ export async function onFreezetime() {
 		}
 
 		if (!recording.isRecording()) {
-			// build demo name
-			const dateString = new Date().toISOString().slice(0, 10);
-
-			let demoName = `${gamestate.state.map.name}_clipper-temp`;
-			demoName = recording.fixDuplicateDemoName(demoName, 'clipper');
-
-			console.log('Trying to record...');
+			const demoName = 'clipper-temp';
 
 			await recording.recordDemo(demoName);
 			recording.onRecordingStart(demoName);
