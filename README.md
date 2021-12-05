@@ -34,7 +34,7 @@ Also, the clipper mode removes the need to record whole games entirely, as you c
 #### **CS:GO setup**
 
 1. Enable clipper's Game State Integration
-   - Copy gamestate_integration_clipper.cfg to your CS:GO config folder. (e.g. C:/Program Files (x86)/Steam/steamapps/common/Counter-Strike Global Offensive/csgo/cfg)
+   - Copy `gamestate_integration_clipper.cfg` to your CS:GO config folder. (e.g. C:/Program Files (x86)/Steam/steamapps/common/Counter-Strike Global Offensive/csgo/cfg)
 2. Enable the remote console
    - Add the launch option -netconport 2121
 
