@@ -7,15 +7,9 @@ import validate from '../util/validate';
 const apiRouter = express.Router();
 
 apiRouter.get('/get-demos', async (req, res) => {
-	const clips = await util.getDemos('clipper');
-	console.log(clips);
-
-	const archives = await util.getDemos('archiver');
-	console.log(archives);
-
 	return res.json({
-		clips,
-		archives,
+		clips: await util.getDemos('clipper'),
+		archives: await util.getDemos('archiver'),
 	});
 });
 

@@ -102,7 +102,7 @@ export async function parseDemos() {
 		await fs.ensureDir(demoInfosPath);
 
 		const demos = await getDemoFilenames(mode);
-		console.log(`updating ${demos.length} demos (${mode})`);
+		console.log(`Updating ${demos.length} demos (${mode})`);
 
 		for (const demoFilename of demos) {
 			await parseDemo(mode, demoFilename);
