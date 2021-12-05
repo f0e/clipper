@@ -1,0 +1,34 @@
+:root {
+	--timberwolf: #cfdbd5;
+	--alabaster: #e8eddf;
+	--maize-crayola: #f5cb5c;
+	--eerie-black: #242423;
+	--jet: #333533;
+
+	--flame: #e4572e;
+	--baby-blue: #70d6ff;
+	--maize-crayola: #f5cb5c;
+
+	--primary: var(--eerie-black);
+	--secondary: var(--timberwolf);
+}
+
+:root[data-theme="theme-light"] {
+	--background-colour: #fff;
+	--text-colour: #000;
+	--text-color-low-opacity: rgba(0, 0, 0, 0.3);
+
+	--card-background: #fff;
+	--card-border: #000;
+	--card-text-colour: #000;
+}
+
+:root[data-theme="theme-dark"] {
+	--background-colour: #000;
+	--text-colour: #fff;
+	--text-color-low-opacity: rgba(255, 255, 255, 0.3);
+
+	--card-background: #fff;
+	--card-border: #000;
+	--card-text-colour: #000;
+}

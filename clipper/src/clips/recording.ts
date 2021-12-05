@@ -1,15 +1,16 @@
 import fs from 'fs-extra';
-import config from '../config';
+import path from 'path';
+import config, { ClipMode } from '../config';
 import netcon from '../connections/netcon';
 import {
 	ERecordingError,
 	IRecordingError,
 	EStopRecordingError,
-} from '../types/clipper.types';
+} from '../../../types/clipper.types';
 
 import * as clipper from './clipper';
 import * as archiver from './archiver';
-import path from 'path';
+import * as util from '../util/util';
 
 let recordingState = {
 	recording: false,
@@ -132,8 +133,8 @@ export function onRecordingStop() {
 	}
 }
 
-export function fixDuplicateDemoName(demoName: string, subFolder: string) {
-	const fullArchivePath = path.join(config.paths.csgo, 'csgo', subFolder);
+export function fixDuplicateDemoName(demoName: string, mode: ClipMode) {
+	const fullArchivePath = util.getBaseDemoPath(mode, true);
 
 	let currentDemoName = demoName;
 	let i = 1;
@@ -146,9 +147,8 @@ export function fixDuplicateDemoName(demoName: string, subFolder: string) {
 
 export async function initialise() {
 	// create directories
-	const clipperPath = path.join(config.paths.csgo, 'csgo', config.paths.demos);
-	await fs.ensureDir(path.join(clipperPath, config.paths.clips));
-	await fs.ensureDir(path.join(clipperPath, config.paths.archives));
+	await fs.ensureDir(util.getBaseDemoPath('clipper', true));
+	await fs.ensureDir(util.getBaseDemoPath('archiver', true));
 
 	// initialise the selected mode
 	switch (config.main.clip_mode) {

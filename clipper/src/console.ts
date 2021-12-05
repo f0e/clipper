@@ -1,6 +1,6 @@
-import netcon from './netcon';
-import config from '../config';
-import * as clipper from '../clips/clipper';
+import netcon from './connections/netcon';
+import config from './config';
+import * as clipper from './clips/clipper';
 
 const helpCommand = 'clipper';
 

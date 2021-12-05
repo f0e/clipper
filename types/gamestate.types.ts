@@ -77,7 +77,7 @@ export interface IGameStateAuth {
 	token: string;
 }
 
-export interface IGameState {
+export default interface IGameState {
 	provider: IGameStateProvider;
 	map: IGameStateMap;
 	round: IGameStateRound;

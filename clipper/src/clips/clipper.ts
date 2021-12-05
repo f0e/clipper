@@ -3,12 +3,13 @@ import path from 'path';
 import config from '../config';
 import gamestate from '../connections/gamestate';
 import netcon from '../connections/netcon';
-import * as clips from './clips';
+import * as recording from './recording';
+import * as util from '../util/util';
 import {
 	ERecordingError,
 	EStopRecordingError,
 	IRecordingError,
-} from '../types/clipper.types';
+} from '../../../types/clipper.types';
 
 const tempDemoName = 'clipper-temp';
 
@@ -18,7 +19,8 @@ let clippingState = {
 };
 
 export function clip(clipName: string) {
-	if (!clips.isRecording()) return netcon.echo('Cannot clip, not recording.');
+	if (!recording.isRecording())
+		return netcon.echo('Cannot clip, not recording.');
 
 	if (clippingState.clipping) {
 		clippingState.clipName = clipName;
@@ -34,17 +36,17 @@ export function clip(clipName: string) {
 
 export async function onFreezetime() {
 	try {
-		if (clips.isRecording()) {
+		if (recording.isRecording()) {
 			try {
-				await clips.stopRecordingDemo();
-				clips.onRecordingStop();
+				await recording.stopRecordingDemo();
+				recording.onRecordingStop();
 
 				saveClip();
 			} catch (e) {
 				if (e instanceof IRecordingError) {
 					switch (e.code) {
 						case EStopRecordingError.NOT_RECORDING: {
-							clips.forceStopRecording();
+							recording.forceStopRecording();
 							break;
 						}
 						case EStopRecordingError.STOP_AT_END_ROUND: {
@@ -58,18 +60,18 @@ export async function onFreezetime() {
 			}
 		}
 
-		if (!clips.isRecording()) {
+		if (!recording.isRecording()) {
 			// build demo name
 			const dateString = new Date().toISOString().slice(0, 10);
 
 			let demoName = `${gamestate.state.map.name}_clipper-temp`;
-			demoName = clips.fixDuplicateDemoName(demoName, config.paths.clips);
+			demoName = recording.fixDuplicateDemoName(demoName, 'clipper');
 
-			await clips.recordDemo(demoName);
-			clips.onRecordingStart(demoName);
+			await recording.recordDemo(demoName);
+			recording.onRecordingStart(demoName);
 
 			if (config.clipper.clip_at_round_end) {
-				await clips.stopRecordingDemo();
+				await recording.stopRecordingDemo();
 			}
 		}
 	} catch (e) {
@@ -92,12 +94,12 @@ async function saveClip() {
 
 	console.log(`Saving clip ${clippingState.clipName}`);
 
-	const csgoPath = path.join(config.paths.csgo, 'csgo');
-	const clipPath = path.join(csgoPath, config.paths.demos, config.paths.clips);
-
 	await fs.rename(
-		path.join(csgoPath, `${tempDemoName}.dem`),
-		path.join(clipPath, `${clippingState.clipName}.dem`)
+		path.join(util.getCsgoPath(), `${tempDemoName}.dem`),
+		path.join(
+			util.getBaseDemoPath('clipper', true),
+			`${clippingState.clipName}.dem`
+		)
 	);
 
 	netcon.echo(`Clip ${clippingState.clipName} saved!`);

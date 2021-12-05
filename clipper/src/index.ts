@@ -3,43 +3,44 @@ import fs from 'fs-extra';
 import path from 'path';
 
 import netcon from './connections/netcon';
-import clipperConsole from './connections/console';
+import clipperConsole from './console';
 import gamestate from './connections/gamestate';
 import config, { parseConfig } from './config';
-import * as clips from './clips/clips';
+import startServer from './server/server';
+import * as recording from './clips/recording';
+import * as util from './util/util';
 
-async function main() {
+export default async function run() {
 	// load config
 	await parseConfig();
 
-	// verify environment variables
+	// verify config
 	if (!config.ports.gamestate) throw new Error('Gamestate port not defined');
 	if (!config.ports.netcon) throw new Error('Netcon port not defined');
 
-	const csgoPath = path.join(config.paths.csgo, 'csgo');
-	if (!fs.existsSync(csgoPath)) throw new Error('CSGO folder does not exist');
+	if (!fs.existsSync(util.getCsgoPath()))
+		throw new Error('CSGO folder does not exist');
 
-	// set up web server
-	const app = express();
-	app.use(express.json());
+	// set up gamestate web server
+	const gamestateServer = express();
+	gamestateServer.use(express.json());
 
-	await app.listen(config.ports.gamestate);
+	await gamestateServer.listen(config.ports.gamestate);
 
 	// set up gamestate
-	gamestate.initialise(app);
+	gamestate.initialise(gamestateServer);
 
 	// set up netcon & console
 	await netcon.connect(config.ports.netcon);
 	await clipperConsole.connect();
 
 	// set up clipper
-	clips.initialise();
+	recording.initialise();
 
 	console.log(`Initialised ${config.main.clip_mode}`);
+
+	// set up web server
+	startServer();
 }
 
-try {
-	main();
-} catch (e) {
-	console.log(e.message);
-}
+run();

@@ -6,9 +6,11 @@ import path from 'path';
 const DEFAULT_CONFIG_PATH = path.join(__dirname, '../default-config.ini');
 const CONFIG_PATH = path.join(os.homedir(), '.clipper/config.ini');
 
+export type ClipMode = 'clipper' | 'archiver';
+
 interface IConfig {
 	main: {
-		clip_mode: 'clipper' | 'archiver';
+		clip_mode: ClipMode;
 	};
 
 	clipper: {
@@ -17,9 +19,10 @@ interface IConfig {
 
 	paths: {
 		csgo: string;
-		demos: string;
-		clips: string;
-		archives: string;
+		base: string;
+		clipper: string;
+		archiver: string;
+		demo_info: string;
 	};
 
 	ports: {

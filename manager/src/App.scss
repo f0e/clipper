@@ -1,0 +1,61 @@
+@import url("https://fonts.googleapis.com/css?family=Inter:regular,bold,italic");
+
+.App {
+	background-color: var(--background-colour);
+	color: var(--text-colour);
+
+	min-height: 100vh;
+
+	text-align: left;
+
+	transition: color 0.1s, background-color 0.2s;
+}
+
+main {
+	padding: 3rem 5rem;
+
+	max-width: 80rem;
+
+	margin: 0 auto;
+}
+
+* {
+	font-family: Inter;
+}
+
+.leaflet-container {
+	width: 100%;
+	height: 100%;
+}
+
+.hidden {
+	display: none;
+}
+
+// override default styles
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin-top: 0;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+}
+
+// material ui links
+.MuiLink-root {
+	color: inherit !important;
+	text-decoration: none !important;
+}
+
+// mobile
+@media only screen and (max-width: 600px) {
+	main {
+		padding: 3rem 1rem;
+	}
+}

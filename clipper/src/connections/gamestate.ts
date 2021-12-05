@@ -1,6 +1,6 @@
 import EventEmitter from 'events';
 import express, { Express, Router } from 'express';
-import { IGameState } from '../types/gamestate.types';
+import IGameState from '../../../types/gamestate.types';
 
 export class GameState extends EventEmitter {
 	state = {} as IGameState;

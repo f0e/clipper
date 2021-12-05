@@ -3,25 +3,26 @@ import path from 'path';
 import config from '../config';
 import gamestate from '../connections/gamestate';
 import netcon from '../connections/netcon';
-import { ERecordingError, IRecordingError } from '../types/clipper.types';
+import { ERecordingError, IRecordingError } from '../../../types/clipper.types';
 
-import * as clips from './clips';
+import * as recording from './recording';
+import * as util from '../util/util';
 
 async function startArchive() {
-	if (clips.isRecording()) return;
+	if (recording.isRecording()) return;
 
 	try {
 		// build demo name
 		const dateString = new Date().toISOString().slice(0, 10);
 
 		let demoName = `${dateString}_${gamestate.state.map.name}`;
-		demoName = clips.fixDuplicateDemoName(demoName, config.paths.archives);
+		demoName = recording.fixDuplicateDemoName(demoName, 'archiver');
 
 		// record archive
-		const archivePath = path.join(config.paths.demos, config.paths.archives);
+		const archivePath = util.getBaseDemoPath('archiver');
 
-		await clips.recordDemo(path.join(archivePath, demoName));
-		clips.onRecordingStart(demoName);
+		await recording.recordDemo(path.join(archivePath, demoName));
+		recording.onRecordingStart(demoName);
 	} catch (e) {
 		if (e instanceof IRecordingError) {
 			switch (e.code) {
