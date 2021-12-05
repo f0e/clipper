@@ -66,7 +66,6 @@ export async function onFreezetime() {
 		if (e instanceof IRecordingError) {
 			switch (e.code) {
 				case ERecordingError.RECORD_ALREADY_RECORDING: {
-					console.log('Hmmmm....', e);
 					netcon.echo(
 						'You are already recording a demo, please stop recording manually to enable clipper.'
 					);
