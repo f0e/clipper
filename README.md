@@ -1,6 +1,4 @@
-<p align="center">
 # clipper
-</p>
 
 ## about
 
