@@ -1,3 +1,7 @@
+<p align="center" style="font-size:2.5rem; font-weight: bold">
+clipper
+</p>
+
 ## about
 
 Clipper is a POV demo recording and management tool for Counter-Strike: Global Offensive.
