@@ -138,11 +138,11 @@ export async function onRecordingStop() {
 }
 
 export function fixDuplicateDemoName(demoName: string, mode: ClipMode) {
-	const fullArchivePath = util.getBaseDemoPath(mode, true);
+	const demoPath = util.getBaseDemoPath(mode, true);
 
 	let currentDemoName = demoName;
 	let i = 1;
-	while (fs.existsSync(path.join(fullArchivePath, demoName))) {
+	while (fs.existsSync(path.join(demoPath, `${currentDemoName}.dem`))) {
 		currentDemoName = demoName + '_' + i++;
 	}
 

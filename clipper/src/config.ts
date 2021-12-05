@@ -64,7 +64,7 @@ function getModifiedKeys(base: any, modified: any) {
 		base,
 		modified,
 		(oldValue: any, newValue: any, modifiedKey: string[]) => {
-			if (!newValue) modifiedKeys.push(modifiedKey);
+			if (newValue == undefined) modifiedKeys.push(modifiedKey);
 		}
 	);
 	return modifiedKeys.length > 0 ? modifiedKeys : null;

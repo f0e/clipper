@@ -19,7 +19,7 @@ export function copyWithoutExtras(newObj: any, target: any) {
 	for (const key of Object.keys(target)) {
 		if (typeof target[key] == 'object') {
 			copyWithoutExtras(newObj[key], target[key]);
-		} else if (target[key] != newObj[key]) {
+		} else if (key in newObj && target[key] != newObj[key]) {
 			target[key] = newObj[key];
 		}
 	}

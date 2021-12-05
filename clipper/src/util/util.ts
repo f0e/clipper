@@ -81,7 +81,7 @@ export async function getDemos(mode: ClipMode) {
 export async function parseDemo(
 	mode: ClipMode,
 	demoName: string,
-	skipIfDone: boolean = true
+	skipIfDone: boolean
 ) {
 	const demoPath = getDemoPath(mode, demoName);
 	const demoInfoPath = getDemoInfoPath(mode, demoName);
@@ -102,10 +102,9 @@ export async function parseDemos() {
 		await fs.ensureDir(demoInfosPath);
 
 		const demos = await getDemoFilenames(mode);
-		console.log(`Updating ${demos.length} demos (${mode})`);
 
 		for (const demoFilename of demos) {
-			await parseDemo(mode, demoFilename);
+			await parseDemo(mode, demoFilename, true);
 		}
 	};
 
