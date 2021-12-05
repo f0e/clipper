@@ -1,5 +1,5 @@
-<p align="center" style="font-size:2.5rem; font-weight: bold">
-clipper
+<p align="center">
+# clipper
 </p>
 
 ## about
