@@ -93,7 +93,7 @@ export async function parseDemo(
 	const demoInfo = await demo.parseDemo(demoPath);
 	await fs.writeJSON(demoInfoPath, demoInfo);
 
-	console.log(`parsed demo ${demoName} (${mode})`);
+	console.log(`Parsed demo ${demoName} (${mode})`);
 }
 
 export async function parseDemos() {

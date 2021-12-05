@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
-import ini from 'ini';
 import path from 'path';
+import * as helpers from './util/helpers';
 
 const CONFIG_PATH = path.join(
 	process.env.APPDATA ||
@@ -58,22 +58,52 @@ const config: IConfig = {
 	},
 };
 
+function getModifiedKeys(base: any, modified: any) {
+	const modifiedKeys: string[][] = [];
+	helpers.detectChanges(
+		base,
+		modified,
+		(oldValue: any, newValue: any, modifiedKey: string[]) => {
+			if (!newValue) modifiedKeys.push(modifiedKey);
+		}
+	);
+	return modifiedKeys.length > 0 ? modifiedKeys : null;
+}
+
 export async function loadConfig() {
 	await fs.ensureFile(CONFIG_PATH);
 
+	// load config
 	try {
 		const newConfig = await fs.readJSON(CONFIG_PATH);
-		Object.assign(config, newConfig);
+
+		// detect changes in config
+		const modifiedKeys = getModifiedKeys(config, newConfig);
+		if (modifiedKeys) {
+			const chungus = modifiedKeys.length == 1 ? '' : 's';
+			console.log(
+				`Config variable${chungus} ${modifiedKeys
+					.map((key) => `'${key.join('.')}'`)
+					.join(', ')} missing. Using default value${chungus}.`
+			);
+		}
+
+		// load.
+		helpers.copyWithoutExtras(newConfig, config);
 	} catch (e) {
-		console.log('Failed to load config');
+		console.log('Failed to load config, saving default');
+		saveConfig();
 	}
 
-	console.log(config);
+	// save config (removes bad variables and adds defaults)
+	saveConfig();
 }
 
 export async function saveConfig() {
 	await fs.ensureFile(CONFIG_PATH);
-	await fs.writeJSON(CONFIG_PATH, config);
+	await fs.writeJSON(CONFIG_PATH, config, {
+		spaces: '\t',
+	});
 
 	console.log('Saved config');
 }
