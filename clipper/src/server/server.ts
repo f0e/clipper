@@ -7,8 +7,6 @@ import morgan from 'morgan';
 // setup
 const app = express();
 
-const port = process.env.PORT || 3001;
-
 // middlewares
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -24,7 +22,7 @@ app.use(
 import apiRouter from './routes/api';
 app.use('/', apiRouter);
 
-export default async function startServer() {
+export default async function startServer(port: number) {
 	app
 		.listen(port, () => {
 			console.log(`App started on port ${port}`);

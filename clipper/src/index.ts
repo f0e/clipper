@@ -39,7 +39,7 @@ export default async function run() {
 	console.log(`Initialised ${config.main.clip_mode}`);
 
 	// set up web server
-	startServer();
+	startServer(config.ports.server);
 }
 
 run();

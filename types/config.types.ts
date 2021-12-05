@@ -20,5 +20,6 @@ export default interface IConfig {
 	ports: {
 		gamestate: number;
 		netcon: number;
+		server: number;
 	};
 }

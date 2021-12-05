@@ -18,6 +18,7 @@ export enum EClipMode {
 
 const Settings = (): ReactElement => {
 	const [config, setConfig] = useState<IConfig | null>(null);
+	const [error, setError] = useState(false);
 	const [loadingConfig, setLoadingConfig] = useState(true);
 	const [savingConfig, setSavingConfig] = useState(false);
 
@@ -27,9 +28,13 @@ const Settings = (): ReactElement => {
 	const getConfig = async () => {
 		setLoadingConfig(true);
 
-		const newConfig = await Api.get('/get-config');
-		console.log('got config:', newConfig);
-		setConfig(newConfig);
+		try {
+			const newConfig = await Api.get('/get-config');
+			console.log('got config:', newConfig);
+			setConfig(newConfig);
+		} catch (e) {
+			setError(true);
+		}
 
 		setLoadingConfig(false);
 	};
@@ -64,6 +69,7 @@ const Settings = (): ReactElement => {
 	}, []);
 
 	if (loadingConfig) return <Loader message="Loading config..." />;
+	if (error) return <h2>Failed to load config.</h2>;
 
 	return (
 		<div className="settings-container">
@@ -183,6 +189,14 @@ const Settings = (): ReactElement => {
 				section="ports"
 				variable="netcon"
 				label={'netcon'}
+			/>
+
+			<CustomText
+				settings={config}
+				changeSetting={changeSetting}
+				section="ports"
+				variable="server"
+				label={'server'}
 			/>
 
 			<br />

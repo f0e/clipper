@@ -31,6 +31,7 @@ const config: IConfig = {
 	ports: {
 		gamestate: 47474,
 		netcon: 2121,
+		server: 3001,
 	},
 };
 
