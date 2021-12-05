@@ -1,6 +1,9 @@
+import fs from 'fs-extra';
+import path from 'path';
 import EventEmitter from 'events';
 import express, { Express, Router } from 'express';
 import IGameState from '../../../types/gamestate.types';
+import * as util from '../util/util';
 
 export class GameState extends EventEmitter {
 	state = {} as IGameState;
@@ -15,7 +18,6 @@ export class GameState extends EventEmitter {
 			this.update(req.body);
 		});
 	}
-
 	initialise = (app: Express) => {
 		app.use(this.router);
 	};

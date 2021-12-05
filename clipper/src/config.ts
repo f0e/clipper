@@ -1,10 +1,14 @@
 import fs from 'fs-extra';
-import os from 'os';
 import ini from 'ini';
 import path from 'path';
 
-const DEFAULT_CONFIG_PATH = path.join(__dirname, '../default-config.ini');
-const CONFIG_PATH = path.join(os.homedir(), '.clipper/config.ini');
+const CONFIG_PATH = path.join(
+	process.env.APPDATA ||
+		(process.platform == 'darwin'
+			? process.env.HOME + '/Library/Preferences'
+			: process.env.HOME + '/.local/share'),
+	'clipper/config.json'
+);
 
 export type ClipMode = 'clipper' | 'archiver';
 
@@ -31,51 +35,47 @@ interface IConfig {
 	};
 }
 
-const config = {} as IConfig;
+const config: IConfig = {
+	main: {
+		clip_mode: 'clipper',
+	},
 
-function getModifiedKeys(
-	base: any,
-	modified: any,
-	modifiedList: string[] = [],
-	keyHistory: string[] = []
-) {
-	for (const key of Object.keys(base)) {
-		const newKeyHistory = keyHistory.concat(key);
+	clipper: {
+		clip_at_round_end: true,
+	},
 
-		if (!(key in modified) || typeof base[key] != typeof modified[key]) {
-			modifiedList.push(newKeyHistory.join('.'));
-		} else if (typeof base[key] == 'object') {
-			getModifiedKeys(base[key], modified[key], modifiedList, newKeyHistory);
-		}
-	}
+	paths: {
+		csgo: 'C:/Program Files (x86)/Steam/steamapps/common/Counter-Strike Global Offensive',
+		base: 'clipper',
+		clipper: 'clips',
+		archiver: 'archives',
+		demo_info: 'demo-info',
+	},
 
-	return modifiedList.length > 0 ? modifiedList : null;
-}
+	ports: {
+		gamestate: 47474,
+		netcon: 2121,
+	},
+};
 
-export async function parseConfig() {
-	// load config values
+export async function loadConfig() {
 	await fs.ensureFile(CONFIG_PATH);
 
-	const defaultConfig = ini.parse(
-		(await fs.readFile(DEFAULT_CONFIG_PATH)).toString()
-	);
-
-	const newConfigContents = (await fs.readFile(CONFIG_PATH)).toString();
-	if (newConfigContents) {
-		Object.assign(config, ini.parse(newConfigContents));
-	} else {
-		// config is empty, copy default config
-		await fs.copy(DEFAULT_CONFIG_PATH, CONFIG_PATH);
+	try {
+		const newConfig = await fs.readJSON(CONFIG_PATH);
+		Object.assign(config, newConfig);
+	} catch (e) {
+		console.log('Failed to load config');
 	}
 
-	const modifiedKeys = getModifiedKeys(defaultConfig, config);
-	if (modifiedKeys) {
-		throw new Error(
-			`Config variables missing: ${modifiedKeys
-				.map((key) => `'${key}'`)
-				.join(', ')}. Please re-copy default-config.ini or add the missing keys`
-		);
-	}
+	console.log(config);
+}
+
+export async function saveConfig() {
+	await fs.ensureFile(CONFIG_PATH);
+	await fs.writeJSON(CONFIG_PATH, config);
+
+	console.log('Saved config');
 }
 
 export default config;

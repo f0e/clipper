@@ -1,18 +1,17 @@
 import express from 'express';
 import fs from 'fs-extra';
-import path from 'path';
 
 import netcon from './connections/netcon';
 import clipperConsole from './console';
 import gamestate from './connections/gamestate';
-import config, { parseConfig } from './config';
+import config, { loadConfig } from './config';
 import startServer from './server/server';
 import * as recording from './clips/recording';
 import * as util from './util/util';
 
 export default async function run() {
 	// load config
-	await parseConfig();
+	await loadConfig();
 
 	// verify config
 	if (!config.ports.gamestate) throw new Error('Gamestate port not defined');
