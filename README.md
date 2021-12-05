@@ -22,7 +22,7 @@ Also, the clipper mode removes the need to record whole games entirely, as you c
 - [Node.js](https://nodejs.org/en/)
 - [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/#windows-stable)
 
-## usage
+## setup
 
 #### **application setup**
 
@@ -36,7 +36,7 @@ Also, the clipper mode removes the need to record whole games entirely, as you c
 2. Enable the remote console
    - Add the launch option -netconport 2121
 
-### running
+## running
 
 1. Open `run.bat` or run the command `yarn start`
 
