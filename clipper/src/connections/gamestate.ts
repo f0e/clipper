@@ -5,19 +5,22 @@ import * as helpers from '../util/helpers';
 
 export class GameState extends EventEmitter {
 	state = {} as IGameState;
-	router: Router;
+	app: Express;
 
 	constructor() {
 		super();
+	}
 
-		this.router = express.Router();
+	initialise = (port: number) => {
+		this.app = express();
 
-		this.router.post('/', (req, res) => {
+		this.app.use(express.json());
+
+		this.app.post('/', (req, res) => {
 			this.update(req.body);
 		});
-	}
-	initialise = (app: Express) => {
-		app.use(this.router);
+
+		this.app.listen(port);
 	};
 
 	update = (data: unknown) => {

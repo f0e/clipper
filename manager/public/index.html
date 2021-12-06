@@ -5,6 +5,13 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 		<title>Clipper</title>
+		
+		<script>
+			const darkTheme = localStorage.getItem("darkTheme") == "true";
+			document.documentElement.dataset.theme = `theme-${
+				darkTheme ? "dark" : "light"
+			}`;
+		</script>
 	</head>
 	<body>
 		<noscript>You need to enable JavaScript to run this app.</noscript>

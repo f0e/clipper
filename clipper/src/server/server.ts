@@ -23,7 +23,7 @@ import apiRouter from './routes/api';
 app.use('/', apiRouter);
 
 export default async function startServer(port: number) {
-	app
+	await app
 		.listen(port, () => {
 			console.log(`App started on port ${port}`);
 		})

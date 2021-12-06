@@ -2,12 +2,14 @@
 	"name": "clipper",
 	"private": true,
 	"scripts": {
-		"setup": "(cd clipper && yarn) && cd .. && (cd manager && yarn)",
+		"setup": "(yarn) && (cd clipper && yarn) && cd .. && (cd manager && yarn)",
 		"start-clipper": "cd clipper && yarn start",
 		"start-manager": "cd manager && yarn start",
 		"start": "concurrently \"yarn start-clipper\" \"yarn start-manager\""
 	},
 	"dependencies": {
-		"concurrently": "^6.4.0"
+		"concurrently": "^6.4.0",
+		"ts-node": "^10.4.0",
+		"typescript": "^4.5.2"
 	}
 }

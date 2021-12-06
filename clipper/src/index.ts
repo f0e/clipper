@@ -20,14 +20,11 @@ export default async function run() {
 	if (!fs.existsSync(util.getCsgoPath()))
 		throw new Error('CSGO folder does not exist');
 
-	// set up gamestate web server
-	const gamestateServer = express();
-	gamestateServer.use(express.json());
-
-	await gamestateServer.listen(config.ports.gamestate);
+	// set up web server
+	startServer(config.ports.server);
 
 	// set up gamestate
-	gamestate.initialise(gamestateServer);
+	gamestate.initialise(config.ports.gamestate);
 
 	// set up netcon & console
 	await netcon.connect(config.ports.netcon);
@@ -37,9 +34,6 @@ export default async function run() {
 	recording.initialise();
 
 	console.log(`Initialised ${config.main.clip_mode}`);
-
-	// set up web server
-	startServer(config.ports.server);
 }
 
 run();

@@ -9,12 +9,16 @@ export class Netcon extends EventEmitter {
 	connect = async (port: number) => {
 		console.log('Waiting for CSGO');
 
-		await waitOn({
-			resources: [`tcp:${port}`],
-			interval: 100,
-			timeout: 90000,
-			window: 500,
-		});
+		try {
+			await waitOn({
+				resources: [`tcp:${port}`],
+				interval: 100,
+				timeout: 90000,
+				window: 500,
+			});
+		} catch (e) {
+			throw new Error('Failed to connect to CSGO');
+		}
 
 		await this.#connection.connect({
 			host: '127.0.0.1',
