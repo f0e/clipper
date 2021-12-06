@@ -55,9 +55,7 @@ apiRouter.post(
 apiRouter.post('/save-config', body('config').isObject(), async (req, res) => {
 	const { config: newConfig } = validate(req);
 
-	console.log('new config: ', newConfig);
 	helpers.copyWithoutExtras(newConfig, config);
-	console.log('copied...', config);
 	await saveConfig();
 
 	return res.json({ success: true });
