@@ -1,11 +1,15 @@
-main {
+.settings-page {
 	max-width: 35rem;
 	margin: 0 auto;
 
 	.setting-description {
 		opacity: 0.65;
 		font-size: 0.9rem;
-		margin-top: -0.3rem;
 		margin-bottom: 1rem;
+
+		p {
+			margin-block-start: 0rem;
+			margin-block-end: 0.5rem;
+		}
 	}
 }

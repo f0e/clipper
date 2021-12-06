@@ -20,12 +20,10 @@ const App = (): ReactElement => {
 						<ApiStore>
 							<Navbar />
 
-							<main>
-								<Routes>
-									<Route path="/" element={<Home />} />
-									<Route path="/settings" element={<Settings />} />
-								</Routes>
-							</main>
+							<Routes>
+								<Route path="/" element={<Home />} />
+								<Route path="/settings" element={<Settings />} />
+							</Routes>
 
 							<MessageBar />
 						</ApiStore>

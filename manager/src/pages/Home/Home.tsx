@@ -51,27 +51,28 @@ const Home = (): ReactElement => {
 		getClips();
 	}, []);
 
-	if (loading) return <Loader message="Loading demos..." />;
-	if (error) return <h2>Failed to load demos.</h2>;
-
 	return (
-		<div>
-			<DemoList title="Clips" demos={clips} />
-
-			<br />
-
-			<DemoList title="Archives" demos={archives} />
-
-			<br />
-
-			{demosNeedParsing && (
-				<LoadingButton
-					variant="contained"
-					onClick={parseDemos}
-					label="Parse demos"
-				/>
+		<main className="home-page">
+			{loading ? (
+				<Loader message="Loading demos..." />
+			) : error ? (
+				<h2>Failed to load demos.</h2>
+			) : (
+				<>
+					<DemoList title="Clips" demos={clips} />
+					<br />
+					<DemoList title="Archives" demos={archives} />
+					<br />
+					{demosNeedParsing && (
+						<LoadingButton
+							variant="contained"
+							onClick={parseDemos}
+							label="Parse demos"
+						/>
+					)}
+				</>
 			)}
-		</div>
+		</main>
 	);
 };
 

@@ -68,141 +68,150 @@ const Settings = (): ReactElement => {
 		getConfig();
 	}, []);
 
-	if (loadingConfig) return <Loader message="Loading config..." />;
-	if (error) return <h2>Failed to load config.</h2>;
-
 	return (
-		<div className="settings-container">
+		<main className="settings-page">
 			<h1>Settings</h1>
 
-			<h3>main</h3>
-			<CustomSelect
-				settings={config}
-				changeSetting={changeSetting}
-				section="main"
-				variable="clip_mode"
-				label={'Clip mode'}
-				options={EClipMode}
-			/>
-			<div className="setting-description">
-				<ul>
-					<li>
-						clipper: Will record each round to a temporary demo, and if clipped
-						will save the demo as a clip. Otherwise, the demo is discarded.
-					</li>
-					<li>
-						archiver: Will record every match automatically, and doesn't require
-						a trigger.
-					</li>
-				</ul>
-			</div>
+			{loadingConfig ? (
+				<Loader message="Loading config..." />
+			) : error ? (
+				<h2>Failed to load config.</h2>
+			) : (
+				<>
+					<h3>main</h3>
+					<CustomSelect
+						settings={config}
+						changeSetting={changeSetting}
+						section="main"
+						variable="clip_mode"
+						label={'Clip mode'}
+						options={EClipMode}
+					/>
+					<div className="setting-description">
+						<p>
+							<b>clipper:</b> Will record each round to a temporary demo, and if
+							clipped will save the demo as a clip. Otherwise, the demo is
+							discarded.
+						</p>
+						<p>
+							<b>archiver:</b> Will record every match automatically, and
+							doesn't require a trigger.
+						</p>
+					</div>
 
-			<br />
+					<br />
 
-			<h3>Clipper</h3>
-			<CustomSwitch
-				settings={config}
-				changeSetting={changeSetting}
-				section="clipper"
-				variable="clip_at_round_end"
-				label={'Clip at round end'}
-			/>
-			<div className="setting-description">
-				Immediately stop recording clips as soon as the round ends. This will
-				prevent the next round from also being recorded, but will cut off the
-				extra period of time between winning a round and the start of the next
-				round.
-			</div>
+					<h3>Clipper</h3>
+					<CustomSwitch
+						settings={config}
+						changeSetting={changeSetting}
+						section="clipper"
+						variable="clip_at_round_end"
+						label={'Clip at round end'}
+					/>
+					<div className="setting-description">
+						Immediately stop recording clips as soon as the round ends. This
+						will prevent the next round from also being recorded, but will cut
+						off the extra period of time between winning a round and the start
+						of the next round.
+					</div>
 
-			<br />
+					<br />
 
-			<h3>Paths</h3>
-			<CustomText
-				settings={config}
-				changeSetting={changeSetting}
-				section="paths"
-				variable="csgo"
-				label={'CS:GO'}
-			/>
-			<div className="setting-description">
-				Your CSGO install path (where csgo.exe is located)
-			</div>
+					<h3>Paths</h3>
+					<CustomText
+						settings={config}
+						changeSetting={changeSetting}
+						section="paths"
+						variable="csgo"
+						label={'CS:GO'}
+					/>
+					<div className="setting-description">
+						Your CSGO install path (where csgo.exe is located)
+					</div>
 
-			<CustomText
-				settings={config}
-				changeSetting={changeSetting}
-				section="paths"
-				variable="base"
-				label={'base'}
-			/>
-			<div className="setting-description">
-				The subfolder inside csgo/ to store clipper-related files in
-			</div>
+					<CustomText
+						settings={config}
+						changeSetting={changeSetting}
+						section="paths"
+						variable="base"
+						label={'base'}
+					/>
+					<div className="setting-description">
+						The subfolder inside csgo/ to store clipper-related files in
+					</div>
 
-			<CustomText
-				settings={config}
-				changeSetting={changeSetting}
-				section="paths"
-				variable="clipper"
-				label={'clipper'}
-			/>
-			<div className="setting-description">
-				The subfolder inside csgo/{'{'}base{'}'} to store clips in
-			</div>
+					<CustomText
+						settings={config}
+						changeSetting={changeSetting}
+						section="paths"
+						variable="clipper"
+						label={'clipper'}
+					/>
+					<div className="setting-description">
+						The subfolder inside csgo/{'{'}base{'}'} to store clips in
+					</div>
 
-			<CustomText
-				settings={config}
-				changeSetting={changeSetting}
-				section="paths"
-				variable="archiver"
-				label={'archiver'}
-			/>
-			<div className="setting-description">
-				The subfolder inside csgo/{'{'}base{'}'} to store archives in
-			</div>
+					<CustomText
+						settings={config}
+						changeSetting={changeSetting}
+						section="paths"
+						variable="archiver"
+						label={'archiver'}
+					/>
+					<div className="setting-description">
+						The subfolder inside csgo/{'{'}base{'}'} to store archives in
+					</div>
 
-			<CustomText
-				settings={config}
-				changeSetting={changeSetting}
-				section="paths"
-				variable="demo_info"
-				label={'demo_info'}
-			/>
-			<div className="setting-description">
-				The subfolder inside csgo/{'{'}base{'}'} to store demo information in
-			</div>
+					<CustomText
+						settings={config}
+						changeSetting={changeSetting}
+						section="paths"
+						variable="demo_info"
+						label={'demo_info'}
+					/>
+					<div className="setting-description">
+						The subfolder inside csgo/{'{'}base{'}'} to store demo information
+						in
+					</div>
 
-			<br />
+					<br />
 
-			<h3>Ports</h3>
-			<CustomText
-				settings={config}
-				changeSetting={changeSetting}
-				section="ports"
-				variable="gamestate"
-				label={'gamestate'}
-			/>
+					<h3>Ports</h3>
+					<CustomText
+						settings={config}
+						changeSetting={changeSetting}
+						section="ports"
+						variable="gamestate"
+						label={'gamestate'}
+					/>
 
-			<CustomText
-				settings={config}
-				changeSetting={changeSetting}
-				section="ports"
-				variable="netcon"
-				label={'netcon'}
-			/>
+					<CustomText
+						settings={config}
+						changeSetting={changeSetting}
+						section="ports"
+						variable="netcon"
+						label={'netcon'}
+					/>
 
-			<CustomText
-				settings={config}
-				changeSetting={changeSetting}
-				section="ports"
-				variable="server"
-				label={'server'}
-			/>
+					<CustomText
+						settings={config}
+						changeSetting={changeSetting}
+						section="ports"
+						variable="server"
+						label={'server'}
+					/>
 
-			<br />
+					<br />
 
-			<LoadingButton onClick={saveConfig} loading={savingConfig} label="Save" />
-		</div>
+					<LoadingButton
+						onClick={saveConfig}
+						loading={savingConfig}
+						label="Save"
+					/>
+				</>
+			)}
+		</main>
 	);
 };
 
