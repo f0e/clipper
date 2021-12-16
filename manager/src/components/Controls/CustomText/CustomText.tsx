@@ -21,6 +21,7 @@ export default function CustomText({
 				value={value}
 				onChange={(e) => changeSetting(section, variable, e.target.value)}
 				size="small"
+				style={{ width: '100%' }}
 			/>
 		</ControlContainer>
 	);

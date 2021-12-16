@@ -1,17 +1,15 @@
 import EventEmitter from 'events';
 import express, { Express, Router } from 'express';
+import { Server } from 'http';
 import IGameState from '../../../types/gamestate.types';
 import * as helpers from '../util/helpers';
 
 export class GameState extends EventEmitter {
 	state = {} as IGameState;
 	app: Express;
+	server: Server;
 
-	constructor() {
-		super();
-	}
-
-	initialise = (port: number) => {
+	initialise = async (port: number) => {
 		this.app = express();
 
 		this.app.use(express.json());
@@ -20,7 +18,20 @@ export class GameState extends EventEmitter {
 			this.update(req.body);
 		});
 
-		this.app.listen(port);
+		this.server = this.app.listen(port);
+	};
+
+	stop = async () => {
+		await this.removeAllListeners();
+
+		if (!this.server) return;
+
+		return new Promise<void>((resolve, reject) => {
+			this.server.close(() => {
+				console.log('Stopped gamestate server');
+				resolve();
+			});
+		});
 	};
 
 	update = (data: unknown) => {

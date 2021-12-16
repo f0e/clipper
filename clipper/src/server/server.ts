@@ -11,7 +11,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.use(morgan('tiny'));
+// app.use(morgan('tiny'));
 app.use(
 	helmet({
 		contentSecurityPolicy: false,
@@ -23,11 +23,7 @@ import apiRouter from './routes/api';
 app.use('/', apiRouter);
 
 export default async function startServer(port: number) {
-	await app
-		.listen(port, () => {
-			console.log(`App started on port ${port}`);
-		})
-		.on('error', (e) => {
-			console.log(`Fatal error: ${e.message}`);
-		});
+	await app.listen(port).on('error', (e) => {
+		console.log(`Fatal error: ${e.message}`);
+	});
 }

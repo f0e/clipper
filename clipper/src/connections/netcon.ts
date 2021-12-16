@@ -5,8 +5,11 @@ import colors from 'colors';
 
 export class Netcon extends EventEmitter {
 	#connection = new Telnet();
+	#connected = false;
 
 	connect = async (port: number) => {
+		await this.stop();
+
 		console.log('Waiting for CSGO');
 
 		try {
@@ -32,10 +35,22 @@ export class Netcon extends EventEmitter {
 			this.onCommand(message);
 		});
 
+		this.#connected = true;
+
 		console.log('Connected to CSGO');
 	};
 
-	connected = () => netcon.connected;
+	stop = async () => {
+		await this.removeAllListeners();
+
+		if (this.#connected) {
+			await this.#connection.end();
+			this.#connected = false;
+			console.log('Closed CSGO connection');
+		}
+	};
+
+	connected = () => this.#connected;
 
 	onCommand = (message: string) => {
 		this.emit('console', message);

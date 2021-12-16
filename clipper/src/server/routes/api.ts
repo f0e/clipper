@@ -1,10 +1,11 @@
 import express from 'express';
 import { query, body } from 'express-validator';
-import config, { saveConfig } from '../../config';
+import config, { configValid, saveConfig, verifyCsgoPath } from '../../config';
 import netcon from '../../connections/netcon';
 import * as util from '../../util/util';
 import * as helpers from '../../util/helpers';
 import validate from '../util/validate';
+import e from 'express';
 
 const apiRouter = express.Router();
 
@@ -60,5 +61,29 @@ apiRouter.post('/save-config', body('config').isObject(), async (req, res) => {
 
 	return res.json({ success: true });
 });
+
+apiRouter.get('/config-valid', async (req, res) => {
+	return res.json(configValid);
+});
+
+apiRouter.get(
+	'/csgo-path-valid',
+	query('path').isString(),
+	async (req, res) => {
+		const { path: csgoPath } = validate(req);
+
+		try {
+			verifyCsgoPath(csgoPath);
+			return res.json({
+				valid: true,
+			});
+		} catch (e) {
+			return res.json({
+				valid: false,
+				error: e.message,
+			});
+		}
+	}
+);
 
 export default apiRouter;

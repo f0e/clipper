@@ -1,6 +1,8 @@
 import fs from 'fs-extra';
 import path from 'path';
+import colors from 'colors';
 import IConfig from '../../types/config.types';
+import { detachGame, initialiseGame } from './';
 import * as helpers from './util/helpers';
 
 const CONFIG_PATH = path.join(
@@ -35,6 +37,8 @@ const config: IConfig = {
 	},
 };
 
+export let configValid: boolean = undefined;
+
 function getModifiedKeys(base: any, modified: any) {
 	const modifiedKeys: string[][] = [];
 	helpers.detectChanges(
@@ -57,11 +61,11 @@ export async function loadConfig() {
 		// detect changes in config
 		const modifiedKeys = getModifiedKeys(config, newConfig);
 		if (modifiedKeys) {
-			const chungus = modifiedKeys.length == 1 ? '' : 's';
+			const s = modifiedKeys.length == 1 ? '' : 's';
 			console.log(
-				`Config variable${chungus} ${modifiedKeys
+				`Config variable${s} ${modifiedKeys
 					.map((key) => `'${key.join('.')}'`)
-					.join(', ')} missing. Using default value${chungus}.`
+					.join(', ')} missing. Using default value${s}.`
 			);
 		}
 
@@ -69,7 +73,6 @@ export async function loadConfig() {
 		helpers.copyWithoutExtras(newConfig, config);
 	} catch (e) {
 		console.log('Failed to load config, saving default');
-		saveConfig();
 	}
 
 	// save config (removes bad variables and adds defaults)
@@ -82,7 +85,46 @@ export async function saveConfig() {
 		spaces: '\t',
 	});
 
-	console.log('Saved config');
+	verifyConfig();
+}
+
+export function verifyCsgoPath(csgoPath: string) {
+	if (!fs.existsSync(csgoPath)) throw new Error('CSGO folder does not exist');
+
+	if (!fs.existsSync(path.join(csgoPath, './csgo.exe')))
+		throw new Error('csgo.exe not found in CSGO folder');
+
+	if (!fs.existsSync(path.join(csgoPath, '/csgo')))
+		throw new Error('/csgo folder not found');
+
+	return true;
+}
+
+export function verifyConfig() {
+	let valid = false;
+
+	try {
+		if (!config.ports.gamestate) throw new Error('Gamestate port not defined');
+		if (!config.ports.netcon) throw new Error('Netcon port not defined');
+
+		verifyCsgoPath(config.paths.csgo);
+
+		valid = true;
+	} catch (e) {
+		console.log(`${colors.yellow('[Config error]')} ${e.message}`);
+		valid = false;
+	}
+
+	if (configValid != valid) {
+		if (configValid != undefined) {
+			if (valid) initialiseGame();
+			else detachGame();
+		}
+
+		configValid = valid;
+	}
+
+	return configValid;
 }
 
 export default config;

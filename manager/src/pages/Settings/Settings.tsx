@@ -1,3 +1,4 @@
+import { Alert } from '@mui/material';
 import React, { ReactElement, useContext, useEffect, useState } from 'react';
 import IConfig from '../../../../types/config.types';
 import CustomSelect from '../../components/Controls/CustomSelect/CustomSelect';
@@ -21,6 +22,7 @@ const Settings = (): ReactElement => {
 	const [error, setError] = useState(false);
 	const [loadingConfig, setLoadingConfig] = useState(true);
 	const [savingConfig, setSavingConfig] = useState(false);
+	const [csgoPathError, setCsgoPathError] = useState(null);
 
 	const Api = useContext(ApiContext);
 	const { setMessage } = useContext(MessageContext);
@@ -64,9 +66,25 @@ const Settings = (): ReactElement => {
 		});
 	};
 
+	const checkCsgoPath = async (path: string) => {
+		const csgoPathValid = await Api.get('/csgo-path-valid', {
+			path,
+		});
+
+		if (csgoPathValid.valid) {
+			setCsgoPathError(null);
+		} else {
+			setCsgoPathError(csgoPathValid.error);
+		}
+	};
+
 	useEffect(() => {
 		getConfig();
 	}, []);
+
+	useEffect(() => {
+		if (config) checkCsgoPath(config.paths.csgo);
+	}, [config?.paths.csgo]);
 
 	return (
 		<main className="settings-page">
@@ -121,7 +139,10 @@ const Settings = (): ReactElement => {
 					<h3>Paths</h3>
 					<CustomText
 						settings={config}
-						changeSetting={changeSetting}
+						changeSetting={async (section: string, key: string, value: any) => {
+							console.log('changed csgo path');
+							changeSetting(section, key, value);
+						}}
 						section="paths"
 						variable="csgo"
 						label={'CS:GO'}
@@ -129,6 +150,12 @@ const Settings = (): ReactElement => {
 					<div className="setting-description">
 						Your CSGO install path (where csgo.exe is located)
 					</div>
+
+					{csgoPathError && (
+						<Alert severity="error" style={{ marginBottom: '0.5rem' }}>
+							{csgoPathError}
+						</Alert>
+					)}
 
 					<CustomText
 						settings={config}
