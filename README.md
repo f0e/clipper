@@ -42,6 +42,10 @@ Also, the clipper mode removes the need to record whole games entirely, as you c
 
 1. Open `run.bat` or run the command `yarn start`
 
+## usage
+
+Type `clipper` in the CS:GO console to view the list of commands.
+
 ## faq
 
 Can I get banned for using this?
