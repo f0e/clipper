@@ -76,7 +76,7 @@ export async function loadConfig() {
 	}
 
 	// save config (removes bad variables and adds defaults)
-	saveConfig();
+	await saveConfig();
 }
 
 export async function saveConfig() {
