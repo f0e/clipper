@@ -30,14 +30,7 @@ export class ClipperConsole {
 	commands: ClipperCommand[] = [
 		new ClipperCommand('clip', 'Clips the current round', () => {
 			if (config.main.clip_mode == 'clipper') {
-				clipper.clip('new-clip');
-			} else {
-				netcon.echo(`Current mode is ${config.main.clip_mode}, not clipper.`);
-			}
-		}),
-		new ClipperCommand('status', 'Get the current status', () => {
-			if (config.main.clip_mode == 'clipper') {
-				clipper.clip('new-clip');
+				clipper.clip();
 			} else {
 				netcon.echo(`Current mode is ${config.main.clip_mode}, not clipper.`);
 			}

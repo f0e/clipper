@@ -92,9 +92,13 @@ export async function stopRecordingDemo() {
 				/^Completed demo, recording time (.*?), game frames (.*?)\.$/;
 			const stopAtRoundEnd =
 				'Demo recording will stop as soon as the round is over.';
+			const recordInDemo = "Can't record during demo playback.";
 
 			if (message == stopAtRoundEnd)
 				return commandFail(ERecordingError.STOP_STOPPING_AT_END_ROUND);
+
+			if (message == recordInDemo)
+				return commandFail(ERecordingError.RECORD_IN_DEMO);
 
 			// check for recording
 			const match = message.match(successRegex);

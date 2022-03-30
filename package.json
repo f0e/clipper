@@ -3,9 +3,11 @@
 	"private": true,
 	"scripts": {
 		"setup": "(yarn) && (cd clipper && yarn) && cd .. && (cd manager && yarn)",
-		"start-clipper": "cd clipper && yarn start",
-		"start-manager": "cd manager && yarn start",
-		"start": "concurrently \"yarn start-clipper\" \"yarn start-manager\""
+		"start:clipper": "cd clipper && yarn start",
+		"start:manager": "cd manager && yarn start",
+		"dev:clipper": "cd clipper && yarn run dev",
+		"start": "concurrently \"yarn start:clipper\" \"yarn start:manager\"",
+		"dev": "concurrently \"yarn dev:clipper\" \"yarn start:manager\""
 	},
 	"dependencies": {
 		"concurrently": "^6.4.0",

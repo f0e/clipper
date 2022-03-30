@@ -1,8 +1,8 @@
 import fs from 'fs-extra';
 import path from 'path';
 import colors from 'colors';
+import { detachGame, initialiseGame } from './game';
 import IConfig from '../../types/config.types';
-import { detachGame, initialiseGame } from './';
 import * as helpers from './util/helpers';
 
 const CONFIG_PATH = path.join(
@@ -85,7 +85,40 @@ export async function saveConfig() {
 		spaces: '\t',
 	});
 
-	verifyConfig();
+	// verify config
+	let valid = false;
+
+	try {
+		if (!config.ports.gamestate) throw new Error('Gamestate port not defined');
+		if (!config.ports.netcon) throw new Error('Netcon port not defined');
+
+		verifyCsgoPath(config.paths.csgo);
+
+		valid = true;
+	} catch (e) {
+		console.log(`${colors.red('[Config error]')} ${e.message}`);
+		valid = false;
+	}
+
+	console.log('Updated and saved config');
+
+	// initialise/detach based on validity
+	if (configValid != valid) {
+		if (valid) {
+			initialiseGame();
+		} else {
+			console.log(
+				`${colors.red(
+					`Clipper ${
+						configValid ? 'stopped' : 'not initialised'
+					}, waiting for config changes.`
+				)}`
+			);
+			detachGame();
+		}
+
+		configValid = valid;
+	}
 }
 
 export function verifyCsgoPath(csgoPath: string) {
@@ -98,33 +131,6 @@ export function verifyCsgoPath(csgoPath: string) {
 		throw new Error('/csgo folder not found');
 
 	return true;
-}
-
-export function verifyConfig() {
-	let valid = false;
-
-	try {
-		if (!config.ports.gamestate) throw new Error('Gamestate port not defined');
-		if (!config.ports.netcon) throw new Error('Netcon port not defined');
-
-		verifyCsgoPath(config.paths.csgo);
-
-		valid = true;
-	} catch (e) {
-		console.log(`${colors.yellow('[Config error]')} ${e.message}`);
-		valid = false;
-	}
-
-	if (configValid != valid) {
-		if (configValid != undefined) {
-			if (valid) initialiseGame();
-			else detachGame();
-		}
-
-		configValid = valid;
-	}
-
-	return configValid;
 }
 
 export default config;
