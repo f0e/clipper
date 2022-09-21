@@ -2,7 +2,7 @@ version: "3"
 
 services:
   app:
-    image: ghcr.io/f0e/clipper:main
+    image: ghcr.io/f0e/clipper:latest
     container_name: clipper
     ports:
       - published: 4747

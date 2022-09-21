@@ -36,18 +36,23 @@ Choose one of the following options.
 
 If you've already got Docker installed you can add Clipper as a container. This will handle the installation for you and will automatically run at system startup by default.
 
+You can run the following command to pull the latest version and run it as a container. Replace the CS:GO path if necessary.
+
+```
+docker run -d --name=clipper -p 4747:4747 --restart unless-stopped --volume "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive:/csgo-folder" ghcr.io/f0e/clipper:latest
+```
+
+There's also a `docker-compose.yml` file for easier container management. You can use that if you prefer.
+
 1. Clone the repo
-2. Run `docker-compose up` inside the directory
+2. Check the `docker-compose.yml` file to see if the CS:GO path is correct. If it isn't, replace it with the path to your CS:GO directory.
+3. Run `docker-compose up -d` inside the directory
 
 ## **or** manual
 
-1. Install [Node.js](https://nodejs.org/en/)
-2. Clone the repo
-3. Open `setup.bat` or run the command `npm run setup`
-
-### running
-
-1. Open `run.bat` or run the command `npm start`
+1. Download the latest [`app.zip` release](https://github.com/f0e/clipper/releases/latest)
+2. Extract the zip file
+3. Open `run.bat`, or run `node clipper/app/index`
 
 # usage
 
