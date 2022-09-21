@@ -221,14 +221,6 @@ const Settings = (): ReactElement => {
 						label={'netcon'}
 					/>
 
-					<CustomText
-						settings={config}
-						changeSetting={changeSetting}
-						section="ports"
-						variable="server"
-						label={'server'}
-					/>
-
 					<br />
 
 					<LoadingButton
