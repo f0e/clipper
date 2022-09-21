@@ -35,12 +35,12 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.REGISTRY }}/f0e/clipper-dev
-          cache-from: type=registry,ref=${{ env.REGISTRY }}/f0e/clipper-dev:buildcache
-          cache-to: type=registry,ref=${{ env.REGISTRY }}/f0e/clipper-dev:buildcache,mode=max
+          tags: ${{ env.REGISTRY }}/f0e/clipper
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/f0e/clipper:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/f0e/clipper:buildcache,mode=max
 
       - name: Copy files from Docker image
-        run: docker cp $(docker create ${{ env.REGISTRY }}/f0e/clipper-dev):/app image-contents/
+        run: docker cp $(docker create ${{ env.REGISTRY }}/f0e/clipper):/app image-contents/
 
       # create windows scripts
       # - name: Create setup script
