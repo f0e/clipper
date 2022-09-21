@@ -58,6 +58,8 @@ There's also a `docker-compose.yml` file for easier container management. You ca
 
 Type `clipper` in the CS:GO console to view the list of commands.
 
+To view and manage clips go to http://localhost:4747
+
 ## faq
 
 Can I get banned for using this?

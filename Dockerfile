@@ -45,7 +45,6 @@ COPY --from=clipper /app/clipper/node_modules clipper/app/node_modules
 # set environment variables
 ENV DOCKER=true
 ENV NODE_ENV=production
-ENV PORT=4747
 EXPOSE 4747
 
 # run the app

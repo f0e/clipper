@@ -7,7 +7,7 @@ import path from 'path';
 
 // setup
 const app = express();
-const env = process.env.NODE_ENV || 'development';
+const env = process.env.IS_DEV ? 'development' : 'production';
 
 // middlewares
 app.use(express.urlencoded({ extended: true }));
@@ -35,11 +35,13 @@ if (env == 'production') {
 }
 
 export default async function startServer() {
-	const port = process.env.PORT || 3001;
+	const port = 4747;
 
 	await app.listen(port).on('error', (e) => {
 		console.log(`Fatal error: ${e.message}`);
 	});
 
-	console.log(`Server started on port ${port}`);
+	if (env == 'production')
+		console.log(`Manager started, access at http://localhost:${port}`);
+	else console.log(`Server started on port ${port}`);
 }

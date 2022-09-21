@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 import config, { loadConfig } from './config';
 import startServer from './server/server';
 
