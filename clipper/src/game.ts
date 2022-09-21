@@ -15,7 +15,7 @@ export async function initialiseGame() {
 	// set up clipper
 	recording.initialise();
 
-	console.log(`Initialised ${config.main.clip_mode}`);
+	netcon.echo(`Clipper started, mode: ${config.main.clip_mode}`);
 }
 
 export async function detachGame() {
@@ -30,5 +30,5 @@ export async function reinitialiseGame() {
 	// set up clipper
 	recording.initialise();
 
-	console.log(`(reinit) Initialised ${config.main.clip_mode}`);
+	netcon.echo(`Clipper changed mode to ${config.main.clip_mode}`);
 }

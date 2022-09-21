@@ -6,8 +6,8 @@ Clipper is a POV demo recording and management tool for Counter-Strike: Global O
 
 It has multiple modes:
 
-- Archiver: Automatically record every match you play and name the files with the date and map name.
-- Clipper: Record specific rounds in a game using a shadowplay-like clipping system. When you clip you enter a name, and then at the end of the round that round's demo is saved with the given name as the filename.
+- Archiver: Automatically record every match you play.
+- Clipper: Record specific rounds in a game using a shadowplay-like clipping system.
 
 You can also view and manage all of your demos through a web interface, which makes organising them easier than working directly with the demo files.
 
