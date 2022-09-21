@@ -63,6 +63,7 @@ export async function getDemos(mode: ClipMode) {
 		const { name: demoName } = path.parse(demoFilename);
 		const demoPath = path.join(getDemoPath(mode, demoFilename));
 
+		const { birthtime: creationDate } = await fs.stat(demoPath);
 		const demoInfo = await getDemoInfo(mode, demoFilename);
 
 		demos.push({
@@ -70,11 +71,15 @@ export async function getDemos(mode: ClipMode) {
 			filename: demoFilename,
 			path: demoPath,
 			mode: mode,
+			created: creationDate,
 
 			parsed: demoInfo != null,
 			info: demoInfo,
 		});
 	}
+
+	// sort demos by recency (todo: fix in docker)
+	demos.sort((a, b) => b.created.getTime() - a.created.getTime());
 
 	return demos;
 }

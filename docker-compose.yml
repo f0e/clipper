@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  app:
+    image: ghcr.io/f0e/clipper:main
+    container_name: clipper
+    ports:
+      - published: 4747
+        target: 4747
+    volumes:
+      - C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive:/csgo-folder
+    restart: unless-stopped

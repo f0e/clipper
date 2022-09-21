@@ -23,7 +23,9 @@ const config: IConfig = {
 	},
 
 	paths: {
-		csgo: 'C:/Program Files (x86)/Steam/steamapps/common/Counter-Strike Global Offensive',
+		csgo: process.env.DOCKER
+			? '/csgo-folder'
+			: 'C:/Program Files (x86)/Steam/steamapps/common/Counter-Strike Global Offensive',
 		base: 'clipper',
 		clipper: 'clips',
 		archiver: 'archives',
@@ -33,7 +35,6 @@ const config: IConfig = {
 	ports: {
 		gamestate: 47474,
 		netcon: 2121,
-		server: 3001,
 	},
 };
 

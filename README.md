@@ -19,30 +19,37 @@ This application removes the need to manually start recording, saving you time a
 
 Also, the clipper mode removes the need to record whole games entirely, as you can just clip certain rounds. This saves disk space, and also makes reviewing demos much easier as you don't have to go through entire demos just to get to the highlights.
 
-## requirements
+# installation
 
-- [Node.js](https://nodejs.org/en/)
-- [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/#windows-stable)
-
-## setup
-
-#### **application setup**
-
-1. Install the [requirements](#requirements)
-2. Open `setup.bat` or run the command `yarn run setup`
-
-#### **CS:GO setup**
+## 1. CS:GO setup
 
 1. Enable clipper's Game State Integration
    - Copy `gamestate_integration_clipper.cfg` to your CS:GO config folder. (e.g. C:/Program Files (x86)/Steam/steamapps/common/Counter-Strike Global Offensive/csgo/cfg)
 2. Enable the remote console
    - Add the launch option `-netconport 2121`
 
-## running
+## 2. application setup
 
-1. Open `run.bat` or run the command `yarn start`
+Choose one of the following options.
 
-## usage
+## docker
+
+If you've already got Docker installed you can add Clipper as a container. This will handle the installation for you and will automatically run at system startup by default.
+
+1. Clone the repo
+2. Run `docker-compose up` inside the directory
+
+## **or** manual
+
+1. Install [Node.js](https://nodejs.org/en/)
+2. Clone the repo
+3. Open `setup.bat` or run the command `npm run setup`
+
+### running
+
+1. Open `run.bat` or run the command `npm start`
+
+# usage
 
 Type `clipper` in the CS:GO console to view the list of commands.
 

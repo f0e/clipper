@@ -5,7 +5,7 @@ import netcon from '../../connections/netcon';
 import * as util from '../../util/util';
 import * as helpers from '../../util/helpers';
 import validate from '../util/validate';
-import e from 'express';
+import path from 'path';
 
 const apiRouter = express.Router();
 
@@ -46,7 +46,7 @@ apiRouter.post(
 	async (req, res) => {
 		const { mode, demoName } = validate(req);
 
-		const demoPath = util.getDemoPath(mode, demoName);
+		const demoPath = path.join(util.getBaseDemoPath(mode), demoName);
 		netcon.playDemo(demoPath);
 
 		return res.json({ success: true });

@@ -1,3 +1,3 @@
 @echo off
-call yarn run setup
+call npm run setup
 pause

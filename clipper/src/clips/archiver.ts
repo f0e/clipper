@@ -3,10 +3,9 @@ import path from 'path';
 import config from '../config';
 import gamestate from '../connections/gamestate';
 import netcon from '../connections/netcon';
-import { ERecordingError, IRecordingError } from '../../../types/clipper.types';
-
-import * as recording from './recording';
+import recording from './recording';
 import * as util from '../util/util';
+import { ERecordingError, IRecordingError } from '../../../types/clipper.types';
 
 async function startArchive() {
 	if (recording.isRecording()) return;

@@ -1,5 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
+import EventEmitter from 'events';
 import config from '../config';
 import netcon from '../connections/netcon';
 import { ERecordingError, IRecordingError } from '../../../types/clipper.types';
@@ -9,174 +10,147 @@ import * as clipper from './clipper';
 import * as archiver from './archiver';
 import * as util from '../util/util';
 
-let recordingState = {
-	recording: false,
-};
+export class Recording extends EventEmitter {
+	#recording = false;
+	#stoppingRecording = false;
 
-let stoppingRecording = false;
+	initialise = async () => {
+		// create directories
+		await fs.ensureDir(util.getBaseDemoPath('clipper', true));
+		await fs.ensureDir(util.getBaseDemoPath('archiver', true));
 
-export const isRecording = () => recordingState.recording;
-export const forceStopRecording = () => (recordingState.recording = false);
+		// initialise the selected mode
+		switch (config.main.clip_mode) {
+			case 'clipper':
+				clipper.initialise();
+				break;
+			case 'archiver':
+				archiver.initialise();
+				break;
+		}
 
-export async function recordDemo(demoName: string) {
-	return new Promise<void>(async (resolve, reject) => {
-		// todo: better solution than this
-		let success = false,
-			fail = false,
-			failReason: ERecordingError;
+		// handle manually stopping recording / game automatic stopping at end of round
+		netcon.on('console', (message: string) => {
+			const demoStoppedRegex =
+				/^Completed demo, recording time (.*?), game frames (.*?)\.$/;
 
-		const commandFail = (error: ERecordingError) => {
-			if (success) return;
+			const match = message.match(demoStoppedRegex);
+			if (match) {
+				this.onRecordingStop();
+			}
+		});
+	};
 
-			fail = true;
-			failReason = error;
-		};
+	isRecording = () => this.#recording;
+	forceStopRecording = () => (this.#recording = false);
 
-		const commandSuccess = () => {
-			fail = false;
-			success = true;
-		};
+	recordDemo = async (demoName: string) => {
+		return new Promise<void>(async (resolve, reject) => {
+			const res = await netcon.sendCommand(`record ${demoName}`);
 
-		const waitForRecord = (message: string) => {
 			const alreadyRecording = 'Already recording.';
 			const waitForRoundOver =
 				'Please start demo recording after current round is over.';
 			const successRegex = /^Recording to (.*?)\.dem\.\.\.$/;
 
-			if (message == alreadyRecording)
-				return commandFail(ERecordingError.RECORD_ALREADY_RECORDING);
+			// check for failed recording
+			if (res == alreadyRecording)
+				return reject(
+					new IRecordingError(ERecordingError.RECORD_ALREADY_RECORDING)
+				);
 
-			if (message == waitForRoundOver)
-				return commandFail(ERecordingError.RECORD_WAIT_FOR_ROUND_OVER);
+			if (res == waitForRoundOver)
+				return reject(
+					new IRecordingError(ERecordingError.RECORD_WAIT_FOR_ROUND_OVER)
+				);
 
 			// check for recording
-			const match = message.match(successRegex);
+			const match = res.match(successRegex);
 			if (match) {
 				const recordingDemoName = match[1];
 				if (recordingDemoName != demoName)
-					return commandFail(ERecordingError.RECORD_RECORDING_DIFFERENT_DEMO);
+					return reject(
+						new IRecordingError(ERecordingError.RECORD_RECORDING_DIFFERENT_DEMO)
+					);
 
-				commandSuccess();
+				return resolve();
 			}
-		};
 
-		await netcon.sendCommand(`record ${demoName}`, waitForRecord);
+			// ??
+			return reject('unknown error');
+		});
+	};
 
-		if (success) return resolve();
-		else if (fail) return reject(new IRecordingError(failReason));
-		else return reject('unknown error');
-	});
-}
+	stopRecordingDemo = async () => {
+		return new Promise<void>(async (resolve, reject) => {
+			this.#stoppingRecording = true;
+			const res = await netcon.sendCommand('stop');
+			this.#stoppingRecording = false;
 
-export async function stopRecordingDemo() {
-	return new Promise<void>(async (resolve, reject) => {
-		// todo: better solution than this
-		let success = false,
-			fail = false,
-			failReason: ERecordingError;
+			if (res == '')
+				return reject(new IRecordingError(ERecordingError.STOP_NOT_RECORDING));
 
-		const commandFail = (error: ERecordingError) => {
-			if (success) return;
-
-			fail = true;
-			failReason = error;
-		};
-
-		const commandSuccess = () => {
-			fail = false;
-			success = true;
-		};
-
-		const waitForRecord = (message: string) => {
 			const successRegex =
 				/^Completed demo, recording time (.*?), game frames (.*?)\.$/;
 			const stopAtRoundEnd =
 				'Demo recording will stop as soon as the round is over.';
 			const recordInDemo = "Can't record during demo playback.";
 
-			if (message == stopAtRoundEnd)
-				return commandFail(ERecordingError.STOP_STOPPING_AT_END_ROUND);
+			// check for failed stop
+			if (res == stopAtRoundEnd)
+				return reject(
+					new IRecordingError(ERecordingError.STOP_STOPPING_AT_END_ROUND)
+				);
 
-			if (message == recordInDemo)
-				return commandFail(ERecordingError.RECORD_IN_DEMO);
+			if (res == recordInDemo)
+				return reject(new IRecordingError(ERecordingError.RECORD_IN_DEMO));
 
-			// check for recording
-			const match = message.match(successRegex);
-			if (match) {
-				commandSuccess();
+			// check for stop
+			const match = res.match(successRegex);
+			if (match) return resolve();
+
+			// ??
+			return reject('unknown error');
+		});
+	};
+
+	onRecordingStart = (demoName: string) => {
+		if (!this.#recording) {
+			// update recording state
+			netcon.echo(`Recording demo '${demoName}'...`);
+			this.#recording = true;
+		}
+	};
+
+	onRecordingStop = async () => {
+		if (this.#stoppingRecording) return; // already handling.
+
+		if (this.#recording) {
+			this.#recording = false;
+			netcon.echo('Stopped recording demo');
+
+			// mode-specific functions
+			if (config.main.clip_mode == 'clipper') {
+				await clipper.saveClip();
 			}
-		};
 
-		stoppingRecording = true;
-		await netcon.sendCommand('stop', waitForRecord);
-		stoppingRecording = false;
+			// parse new demos
+			util.parseDemos(); // run async, parsing takes a while
+		}
+	};
 
-		if (success) return resolve();
-		else if (fail) return reject(new IRecordingError(failReason));
-		else return reject(new IRecordingError(ERecordingError.STOP_NOT_RECORDING));
-	});
-}
+	fixDuplicateDemoName = (demoName: string, mode: ClipMode) => {
+		const demoPath = util.getBaseDemoPath(mode, true);
 
-export function onRecordingStart(demoName: string) {
-	if (!recordingState.recording) {
-		// update recording state
-		netcon.echo(`Recording demo '${demoName}'...`);
-		recordingState.recording = true;
-	}
-}
-
-export async function onRecordingStop() {
-	if (stoppingRecording) return; // already handling.
-
-	if (recordingState.recording) {
-		recordingState.recording = false;
-		netcon.echo('Stopped recording demo');
-
-		// mode-specific functions
-		if (config.main.clip_mode == 'clipper') {
-			await clipper.saveClip();
+		let currentDemoName = demoName;
+		let i = 1;
+		while (fs.existsSync(path.join(demoPath, `${currentDemoName}.dem`))) {
+			currentDemoName = demoName + '_' + i++;
 		}
 
-		// parse new demos
-		util.parseDemos(); // run async, parsing takes a while
-	}
+		return currentDemoName;
+	};
 }
 
-export function fixDuplicateDemoName(demoName: string, mode: ClipMode) {
-	const demoPath = util.getBaseDemoPath(mode, true);
-
-	let currentDemoName = demoName;
-	let i = 1;
-	while (fs.existsSync(path.join(demoPath, `${currentDemoName}.dem`))) {
-		currentDemoName = demoName + '_' + i++;
-	}
-
-	return currentDemoName;
-}
-
-export async function initialise() {
-	// create directories
-	await fs.ensureDir(util.getBaseDemoPath('clipper', true));
-	await fs.ensureDir(util.getBaseDemoPath('archiver', true));
-
-	// initialise the selected mode
-	switch (config.main.clip_mode) {
-		case 'clipper':
-			clipper.initialise();
-			break;
-		case 'archiver':
-			archiver.initialise();
-			break;
-	}
-
-	// handle manually stopping recording / game automatic stopping at end of round
-	netcon.on('console', (message: string) => {
-		const demoStoppedRegex =
-			/^Completed demo, recording time (.*?), game frames (.*?)\.$/;
-
-		const match = message.match(demoStoppedRegex);
-		if (match) {
-			onRecordingStop();
-		}
-	});
-}
+const recording = new Recording();
+export default recording;

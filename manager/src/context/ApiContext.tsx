@@ -21,7 +21,7 @@ export const ApiStore: FunctionComponent = ({ children }) => {
 		parameters?: ApiCallParameters
 	): Promise<any> => {
 		try {
-			const res = await axios.get(url, {
+			const res = await axios.get('/api/' + url, {
 				params: parameters,
 			});
 
@@ -44,7 +44,7 @@ export const ApiStore: FunctionComponent = ({ children }) => {
 		parameters?: ApiCallParameters
 	): Promise<any> => {
 		try {
-			const res = await axios.post(url, parameters);
+			const res = await axios.post('/api/' + url, parameters);
 
 			return res.data.data;
 		} catch (e: any) {

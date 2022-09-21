@@ -16,7 +16,7 @@ const DemoList = ({ title, demos }: DemoListProps): ReactElement => {
 
 			<div className="demos">
 				{demos.map((demo) => (
-					<DemoCard demo={demo} />
+					<DemoCard key={demo.filename} demo={demo} />
 				))}
 			</div>
 		</div>

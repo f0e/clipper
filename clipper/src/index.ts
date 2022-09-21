@@ -2,7 +2,7 @@ import config, { loadConfig } from './config';
 import startServer from './server/server';
 
 // set up web server
-startServer(config.ports.server);
+startServer();
 
 // load config
 loadConfig();

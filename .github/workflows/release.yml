@@ -1,0 +1,81 @@
+name: Build
+
+on: [push]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        id: build
+        with:
+          context: .
+          push: true
+          tags: ${{ env.REGISTRY }}/f0e/clipper-dev
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/f0e/clipper-dev:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/f0e/clipper-dev:buildcache,mode=max
+
+      - name: Copy files from Docker image
+        run: docker cp $(docker create ${{ env.REGISTRY }}/f0e/clipper-dev):/app image-contents/
+
+      # create windows scripts
+      # - name: Create setup script
+      #   working-directory: image-contents/
+      #   run: |
+      #     {
+      #       echo "@echo off"
+      #       echo "cd clipper/app"
+      #       echo "call npm install"
+      #       echo "echo."
+      #       echo "echo done"
+      #       echo "pause"
+      #     } > setup.bat
+
+      - name: Create run script
+        working-directory: image-contents/
+        run: |
+          {
+            echo "@echo off"
+            echo "node clipper/app/index"
+            echo "echo."
+            echo "echo done"
+            echo "pause"
+          } > run.bat
+
+      - name: Archive app files
+        working-directory: image-contents/
+        run: sudo zip -r ../app.zip *
+        # run: sudo zip -r ../app.zip * -x "**/node_modules/*"
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: steps.tag_version.outputs.new_tag
+        with:
+          tag_name: ${{ steps.tag_version.outputs.new_tag }}
+          files: |
+            app.zip
+          fail_on_unmatched_files: true

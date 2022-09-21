@@ -1,3 +1,3 @@
 @echo off
-yarn start
+call npm start
 pause

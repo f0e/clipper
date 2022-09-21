@@ -2,7 +2,7 @@ import netcon from './connections/netcon';
 import clipperConsole from './console';
 import gamestate from './connections/gamestate';
 import config from './config';
-import * as recording from './clips/recording';
+import recording from './clips/recording';
 
 export async function initialiseGame() {
 	// set up gamestate

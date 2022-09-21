@@ -18,6 +18,7 @@ export default class Demo {
 	filename: string;
 	path: string;
 	mode: ClipMode;
+	created: Date;
 
 	parsed: boolean;
 	info: DemoInfo;

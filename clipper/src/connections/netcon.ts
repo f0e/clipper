@@ -12,19 +12,14 @@ export class Netcon extends EventEmitter {
 
 		console.log('Waiting for CSGO');
 
-		try {
-			await waitOn({
-				resources: [`tcp:${port}`],
-				interval: 100,
-				timeout: 90000,
-				window: 500,
-			});
-		} catch (e) {
-			throw new Error('Failed to connect to CSGO');
-		}
+		const host = process.env.DOCKER ? 'host.docker.internal' : '127.0.0.1';
+
+		await waitOn({
+			resources: [`tcp:${host}:${port}`],
+		});
 
 		await this.#connection.connect({
-			host: '127.0.0.1',
+			host,
 			port,
 			negotiationMandatory: false,
 			timeout: 1500,
@@ -33,6 +28,11 @@ export class Netcon extends EventEmitter {
 		this.#connection.getSocket().on('data', (data) => {
 			const message = data.toString('utf8').trim();
 			this.onCommand(message);
+		});
+
+		this.#connection.on('close', () => {
+			// csgo closed.. wait to reconnect:)
+			this.connect(port);
 		});
 
 		this.#connected = true;
@@ -61,30 +61,29 @@ export class Netcon extends EventEmitter {
 		this.sendCommand(`echo [clipper] ${message}`);
 	};
 
-	sendCommand = async (
-		command: string,
-		listener?: (message: string) => void
-	) => {
-		if (listener) this.on('console', listener);
+	sendCommand = async (command: string) => {
+		let response = '';
+
+		const listener = (message: string) => (response = message);
+
+		this.on('console', listener);
 
 		try {
-			return await this.#connection.exec(command);
+			await this.#connection.exec(command);
 		} catch (e) {}
 
-		if (listener) this.removeListener('console', listener);
+		this.removeListener('console', listener);
+
+		return response;
 	};
 
 	getVar = async (varName: string) => {
 		return new Promise<any>(async (resolve, reject) => {
 			let value = null;
 
-			const listener = (message: string) => {
-				if (message.includes(`"${varName}" =`)) {
-					value = message.split(' = "')[1].split('"')[0]; // poo todo: use regex ? :)
-				}
-			};
-
-			await this.sendCommand(varName, listener);
+			const res = await this.sendCommand(varName);
+			if (res.includes(`"${varName}" =`))
+				value = res.split(' = "')[1].split('"')[0]; // poo todo: use regex ? :)
 
 			if (value) resolve(value);
 			else reject();

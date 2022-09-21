@@ -7,6 +7,7 @@ import Navbar from './components/Navbar/Navbar';
 import MessageBar from './components/MessageBar/MessageBar';
 import Home from './pages/Home/Home';
 import Settings from './pages/Settings/Settings';
+import Edit from './pages/Edit/Edit';
 
 import './styles/variables.scss';
 import './App.scss';
@@ -23,6 +24,7 @@ const App = (): ReactElement => {
 							<Routes>
 								<Route path="/" element={<Home />} />
 								<Route path="/settings" element={<Settings />} />
+								<Route path="/:mode/:name" element={<Edit />} />
 							</Routes>
 
 							<MessageBar />
