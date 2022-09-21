@@ -29,23 +29,14 @@ const DemoCard = ({ demo }: DemoCardProps): ReactElement => {
 		setWaitingToPlay(false);
 	};
 
-	// const parse = async () => {
-	// 	setParsing(true);
-
-	// 	await Api.post('/parse-demo', {
-	// 		mode: demo.mode,
-	// 		demoName: demo.filename,
-	// 	});
-
-	// 	setParsing(false);
-	// };
-
 	return (
 		<Card className="demo-card" variant="outlined">
 			<CardContent className="demo-card-content">
-				<div className="demo-map-icon">
-					<MapIcon map={demo.info.headers.map} />
-				</div>
+				{demo.parsed && (
+					<div className="demo-map-icon">
+						<MapIcon map={demo.info.headers.map} />
+					</div>
+				)}
 
 				<div className="demo-info">
 					<span className="demo-name">{demo.name}</span>

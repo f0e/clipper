@@ -5,16 +5,19 @@ import gamestate from '../connections/gamestate';
 import netcon from '../connections/netcon';
 import recording from './recording';
 import * as util from '../util/util';
+import { getDateString } from '../util/helpers';
 import { ERecordingError, IRecordingError } from '../../../types/clipper.types';
 
 async function startArchive() {
+	console.log('trying to start archive.');
+
 	if (recording.isRecording()) return;
 
 	try {
 		// build demo name
-		const dateString = new Date().toISOString().slice(0, 10);
-
-		let demoName = `${dateString}_${gamestate.state.map.name}`;
+		let demoName = `${getDateString()}_${gamestate.state.map.name}_${
+			gamestate.state.map.mode
+		}`;
 		demoName = recording.fixDuplicateDemoName(demoName, 'archiver');
 
 		// record archive
@@ -30,7 +33,9 @@ async function startArchive() {
 					break;
 				}
 			}
-		} else throw e;
+		} else {
+			console.log('unknown error.');
+		}
 	}
 }
 

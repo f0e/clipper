@@ -31,8 +31,12 @@ export class Netcon extends EventEmitter {
 		});
 
 		this.#connection.on('close', () => {
-			// csgo closed.. wait to reconnect:)
-			this.connect(port);
+			if (this.#connected) {
+				// csgo closed.. wait to reconnect:)
+				console.log('Lost connection to CSGO');
+				this.#connected = false;
+				this.connect(port);
+			}
 		});
 
 		this.#connected = true;
@@ -40,12 +44,16 @@ export class Netcon extends EventEmitter {
 		console.log('Connected to CSGO');
 	};
 
-	stop = async () => {
+	clear = async () => {
 		await this.removeAllListeners();
+	};
+
+	stop = async () => {
+		await this.clear();
 
 		if (this.#connected) {
-			await this.#connection.end();
 			this.#connected = false;
+			await this.#connection.end();
 			console.log('Closed CSGO connection');
 		}
 	};

@@ -5,6 +5,7 @@ import gamestate from '../connections/gamestate';
 import netcon from '../connections/netcon';
 import recording from './recording';
 import * as util from '../util/util';
+import { getDateString } from '../util/helpers';
 import { ERecordingError, IRecordingError } from '../../../types/clipper.types';
 
 const tempDemoName = 'clipper-temp';
@@ -23,8 +24,17 @@ export function clip() {
 		return;
 	}
 
+	// todo: is there some way to let the user name to their clips in the console when they clip???
+	// all i can think of is using echo but thats terrible
+
+	// build demo name
+	let demoName = `${getDateString()}_${gamestate.state.map.name}_${
+		gamestate.state.map.mode
+	}_round${gamestate.state.map.round}`;
+	demoName = recording.fixDuplicateDemoName(demoName, 'clipper');
+
 	clippingState.clipping = true;
-	clippingState.clipName = 'clip';
+	clippingState.clipName = demoName;
 
 	netcon.echo(`Clipping to ${clippingState.clipName}`);
 }
@@ -74,7 +84,9 @@ export async function onFreezetime() {
 					break;
 				}
 			}
-		} else throw e;
+		} else {
+			console.log('unknown error.');
+		}
 	}
 }
 

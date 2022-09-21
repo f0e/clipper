@@ -21,8 +21,12 @@ export class GameState extends EventEmitter {
 		this.server = this.app.listen(port);
 	};
 
-	stop = async () => {
+	clear = async () => {
 		await this.removeAllListeners();
+	};
+
+	stop = async () => {
+		await this.clear();
 
 		if (!this.server) return;
 

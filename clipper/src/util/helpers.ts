@@ -24,3 +24,7 @@ export function copyWithoutExtras(newObj: any, target: any) {
 		}
 	}
 }
+
+export function getDateString() {
+	return new Date().toISOString().slice(0, 10);
+}

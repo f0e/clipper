@@ -19,5 +19,16 @@ export async function initialiseGame() {
 }
 
 export async function detachGame() {
+	console.log('detached');
 	Promise.all([gamestate.stop(), netcon.stop()]);
+}
+
+export async function reinitialiseGame() {
+	// clear existing event listeners
+	await Promise.all([gamestate.clear(), netcon.clear()]);
+
+	// set up clipper
+	recording.initialise();
+
+	console.log(`(reinit) Initialised ${config.main.clip_mode}`);
 }

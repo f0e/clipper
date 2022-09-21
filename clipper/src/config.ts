@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import colors from 'colors';
-import { detachGame, initialiseGame } from './game';
+import { reinitialiseGame, initialiseGame, detachGame } from './game';
 import IConfig from '../../types/config.types';
 import * as helpers from './util/helpers';
 
@@ -119,6 +119,9 @@ export async function saveConfig() {
 		}
 
 		configValid = valid;
+	} else {
+		// reattach
+		if (valid) await reinitialiseGame();
 	}
 }
 
